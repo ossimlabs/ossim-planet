@@ -1,0 +1,36 @@
+// Note: If you are specifying opacity values then the 
+// bottom layer is not applied since it is just initially copied into the destination
+// All layers after that are blended based on the apacity.  The default opacity is 255
+// which indicates completely opaque and anything less than that defines how 
+// translucent the layer is.
+//
+// Note:  You must name each layer archive0 upto archive<n-1> .  
+//        So currently if you delete a layer you must manually re-number
+//        each keyword in the list.
+//
+// We support local and remote files.  Currently for remote we only support
+// wms and you must give the full string  for STYLES and layers you want and
+// make sure you end it with an &.
+//
+
+
+
+//archive0.type: local
+//archive0.file0: /data/earth/land_shallow_topo_east_tiled.tif
+//archive0.file1: /data/earth/land_shallow_topo_west_tiled.tif
+//archive0.transparent_color_flag:0
+//archive0.transparent_color: 0 0 0
+//archive0.opacity: 255
+
+//archive0.type: wms
+//archive0.server: http://neptune.flids.com/cgi-bin/ngos.cgi?LAYERS=Earth_Image,ngos
+//archive0.cache_dir: c:/data/wms/ngos/all
+
+//archive0.server: http://wmt.jpl.nasa.gov/cgi-bin/wmt.cgi?STYLES=visual&LAYERS=global_mosaic&sharp=0.0&
+
+archive0.type:wms
+archive0.server: http://wms.telascience.org/cgi-bin/bmng_wms_t?LAYERS=BMNG
+archive0.cache_dir: /data/wms/bmng
+archive0.opacity: 255
+
+

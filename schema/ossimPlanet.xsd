@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <xs:element name="AbstractObjectGroup" type="AbstractObjectType" abstract="true"/>
+    <xs:complexType name="AbstractObjectType" abstract="true">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string" minOccurs="0" maxOccurs="1"> </xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="optional"> </xs:attribute>
+        <xs:attribute name="parentId" type="xs:string" use="optional"> </xs:attribute>
+    </xs:complexType>
+    <xs:element name="address" type="xs:string" default=""/>
+    <xs:element name="range" type="xs:double" default="0.0"/>
+    <xs:element name="longitude" type="angle180Type" default="0.0"/>
+    <xs:element name="latitude" type="angle90Type" default="0.0"/>
+    <xs:element name="altitude" type="xs:double" default="0.0"/>
+    <xs:attribute name="vref">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="wgs84"/>
+                <xs:enumeration value="msl"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="groupType">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="groundTexture"/>
+                <xs:enumeration value="feature"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <xs:simpleType name="objectType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Placemark"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="heading" type="angle360Type" default="0.0"/>
+    <xs:element name="pitch" type="angle180Type" default="0.0"/>
+    <xs:element name="roll" type="angle180Type" default="0.0"/>
+    <xs:simpleType name="anglepos90Type">
+        <xs:restriction base="xs:double">
+            <xs:minInclusive value="0.0"/>
+            <xs:maxInclusive value="90.0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="angle90Type">
+        <xs:restriction base="xs:double">
+            <xs:minInclusive value="-90"/>
+            <xs:maxInclusive value="90.0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="anglepos180Type">
+        <xs:restriction base="xs:double">
+            <xs:minInclusive value="0.0"/>
+            <xs:maxInclusive value="180.0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="angle180Type">
+        <xs:restriction base="xs:double">
+            <xs:minInclusive value="-180.0"/>
+            <xs:maxInclusive value="180.0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="angle360Type">
+        <xs:restriction base="xs:double">
+            <xs:minInclusive value="-360.0"/>
+            <xs:maxInclusive value="360.0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="metaKeyEnumType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="shift"/>
+            <xs:enumeration value="ctrl"/>
+            <xs:enumeration value="alt"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="KeyType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value=".|space|delete|return|home|escape|right|left|up|down"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="mouseButtonType">
+        <xs:restriction base="xs:string">
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="mouseButtonStateEnumType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="press"/>
+            <xs:enumeration value="release"/>
+            <xs:enumeration value="doubleClick"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="filename" type="xs:string"></xs:element>
+    <xs:element name="extrude" type="xs:boolean" default="0"/>
+    <xs:simpleType name="altitudeModeEnumType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="clampToGround"/>
+            <xs:enumeration value="relativeToGround"/>
+            <xs:enumeration value="absolute"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="timeUnitEnumType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="seconds"/>
+         </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="AbstractInputDeviceGroup" type="AbstractInputDeviceType" abstract="true"/>
+    <xs:complexType name="AbstractInputDeviceType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="AbstractObjectType">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="Link" type="LinkType" substitutionGroup="AbstractObjectGroup"/>
+    <xs:complexType name="LinkType">
+        <xs:complexContent>
+            <xs:extension base="AbstractObjectType">
+                <xs:sequence>
+                </xs:sequence>
+                <xs:attribute name="href" type="xs:anyURI" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="Keyboard" type="KeyboardType" abstract="false" final="#all"
+        substitutionGroup="AbstractInputDeviceGroup"/>
+    <xs:complexType name="KeyboardType" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="AbstractInputDeviceType">
+                <xs:attribute name="key" type="KeyType" use="optional"/>    
+                <xs:attribute name="metaKey" type="metaKeyEnumType" use="optional"/>    
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Mouse" type="MouseType" abstract="false" final="#all"
+        substitutionGroup="AbstractInputDeviceGroup"/>
+    <xs:complexType name="MouseType" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="AbstractInputDeviceType">
+                <xs:attribute name="button" type="mouseButtonType" />    
+                <xs:attribute name="state" type="mouseButtonStateEnumType" />    
+                <xs:attribute name="metaKey" type="metaKeyEnumType" />    
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="AbstractActionObjectGroup" type="AbstractActionObjectType" abstract="true"/>
+    <xs:complexType name="AbstractActionObjectType" abstract="true">
+        <xs:attribute name="id" type="xs:ID" use="optional"> </xs:attribute>
+        <xs:attribute name="target" type="xs:string" use="optional"> </xs:attribute>
+        <xs:attribute name="origin" type="xs:string" use="optional"> </xs:attribute>
+    </xs:complexType>
+    
+     <xs:element name="Add" type="AbstractActionObjectContainerType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    <xs:element name="Remove" type="AbstractActionObjectContainerType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    <xs:element name="Set" type="AbstractActionObjectContainerType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    <xs:element name="Get" type="AbstractActionObjectContainerType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    <xs:element name="FlyTo" type="AbstractActionObjectFlyToType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    <xs:element name="Bind" type="BindType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    <xs:element name="Unbind" type="BindType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    <xs:element name="UnbindAll" type="BindType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    <xs:element name="SendMessage" type="SendMessageType" abstract="false" final="#all"
+        substitutionGroup="AbstractActionObjectGroup"/>
+    
+    <xs:complexType name="AbstractActionObjectContainerType" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="AbstractActionObjectType">
+                <xs:sequence>
+                    <xs:element ref="AbstractObjectGroup" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="BindType" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="AbstractActionObjectType">
+                <xs:sequence>
+                    <xs:element ref="AbstractInputDeviceGroup" minOccurs="0" maxOccurs="1"></xs:element>
+                    <xs:element ref="AbstractActionObjectGroup" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="SendMessageType" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="AbstractActionObjectType">
+                <xs:sequence>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AbstractActionObjectFlyToType" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="AbstractActionObjectType">
+                <xs:sequence>
+                    <xs:element ref="Camera" minOccurs="0" maxOccurs="1"></xs:element>
+                    <xs:element ref="LookAt" minOccurs="0" maxOccurs="1"></xs:element>
+                    <xs:element ref="address" minOccurs="0" maxOccurs="1"></xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="Message" type="MessageType"/>
+    <xs:complexType name="MessageType" final="#all">
+        <xs:sequence>
+            <xs:element ref="AbstractActionObjectGroup" minOccurs="0" maxOccurs="unbounded"></xs:element>        
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="optional"/>
+    </xs:complexType>
+   
+    <xs:element name="Identity" type="IdentityType" abstract="false" substitutionGroup="AbstractObjectGroup"/>
+    <xs:complexType name="IdentityType">
+        <xs:complexContent>
+            <xs:extension base="AbstractObjectType">
+                <xs:sequence>
+                    <xs:element name="username" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="password" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="domain" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="AbstractExpireTimeGroup" type="AbstractExpireTime" abstract="true"
+        substitutionGroup="AbstractObjectGroup"/>
+    <xs:complexType name="AbstractExpireTime"> 
+        <xs:complexContent>
+            <xs:extension base="AbstractObjectType"/>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="ExpireDuration" type="ExpireDurationType" abstract="false"
+    substitutionGroup="AbstractExpireTimeGroup"/>
+    <xs:complexType name="ExpireDurationType" final="#all">
+        <xs:complexContent>
+            <xs:extension base="AbstractExpireTime">
+                <xs:attribute name="value" type="xs:double"></xs:attribute>
+                <xs:attribute name="unit" type="timeUnitEnumType"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="AbstractGeometryGroup" type="AbstractGeometryType" abstract="true"
+        substitutionGroup="AbstractObjectGroup"/>
+    <xs:complexType name="AbstractGeometryType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="AbstractObjectType"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="coordinates" type="coordinatesType"/>
+    <xs:simpleType name="coordinatesType">
+        <xs:list itemType="xs:string"/>
+    </xs:simpleType>
+
+    <xs:element name="altitudeModeGroup" abstract="false"/>
+    <xs:element name="altitudeMode" type="altitudeModeEnumType" default="clampToGround"
+        substitutionGroup="altitudeModeGroup"/>
+
+    <xs:element name="PointModel" type="PointModeType" substitutionGroup="AbstractGeometryGroup"/>
+    <xs:complexType name="PointModeType" final="#all">
+        <xs:complexContent>
+            <xs:extension base="AbstractGeometryType">
+                <xs:sequence>
+                    <xs:element ref="Link"/>
+                    <xs:element ref="longitude" minOccurs="0"/>
+                    <xs:element ref="latitude" minOccurs="0"/>
+                    <xs:element ref="altitude" minOccurs="0"/>
+                    <xs:element ref="heading" minOccurs="0"/>
+                    <xs:element ref="pitch" minOccurs="0"/>
+                    <xs:element ref="roll" minOccurs="0"/>
+                    <xs:element ref="altitudeMode" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="Point" type="PointType" substitutionGroup="AbstractGeometryGroup"/>
+    <xs:complexType name="PointType" final="#all">
+        <xs:complexContent>
+            <xs:extension base="AbstractGeometryType">
+                <xs:sequence>
+                    <xs:element ref="extrude" minOccurs="0" maxOccurs="1"/>
+                    <xs:element ref="altitudeMode" minOccurs="0" maxOccurs="1"/>
+                    <xs:element ref="coordinates" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="AbstractViewGroup" type="AbstractViewType" abstract="true"
+        substitutionGroup="AbstractObjectGroup"/>
+    <xs:complexType name="AbstractViewType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="AbstractObjectType"/>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="LookAt" type="LookAtType"
+        substitutionGroup="AbstractViewGroup"/>
+    <xs:complexType name="LookAtType" final="#all">
+        <xs:complexContent>
+            <xs:extension base="AbstractViewType">
+                <xs:sequence>
+                    <xs:element ref="longitude" minOccurs="0"></xs:element>
+                    <xs:element ref="latitude" minOccurs="0"></xs:element>
+                    <xs:element ref="altitude" minOccurs="0"></xs:element>
+                    <xs:element ref="heading" minOccurs="0"/>
+                    <xs:element ref="pitch" minOccurs="0"/>
+                    <xs:element ref="roll" minOccurs="0"/>
+                    <xs:element ref="altitudeModeGroup" minOccurs="0"/>
+                    <xs:element ref="range" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute ref="vref"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="Camera" type="CameraType" abstract="false"
+    substitutionGroup="AbstractViewGroup"/>
+    <xs:complexType name="CameraType">
+        <xs:complexContent>
+            <xs:extension base="AbstractViewType">
+                <xs:sequence>
+                    <xs:element ref="longitude" minOccurs="0"></xs:element>
+                    <xs:element ref="latitude" minOccurs="0"></xs:element>
+                    <xs:element ref="altitude" minOccurs="0"></xs:element>
+                    <xs:element ref="heading" minOccurs="0"/>
+                    <xs:element ref="pitch" minOccurs="0"/>
+                    <xs:element ref="roll" minOccurs="0"/>
+                    <xs:element ref="altitudeModeGroup" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute ref="vref"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="AbstractFeatureGroup" type="AbstractFeatureType" abstract="true"
+        substitutionGroup="AbstractObjectGroup"/>
+    <xs:complexType name="AbstractFeatureType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="AbstractObjectType">
+                <xs:sequence>
+                    <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1"> </xs:element>
+                    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"> </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="AbstractWorldFeatureGroup" type="AbstractWorldFeatureType" abstract="true"
+        substitutionGroup="AbstractFeatureGroup"/>
+    <xs:complexType name="AbstractWorldFeatureType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="AbstractFeatureType"> 
+                <xs:sequence>
+                    <xs:element ref="LookAt" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="AbstractScreenFeatureGroup" type="AbstractScreenFeatureType" abstract="true"
+        substitutionGroup="AbstractFeatureGroup"/>
+    <xs:complexType name="AbstractScreenFeatureType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="AbstractFeatureType"> </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+     <xs:element name="Image" type="ImageType" substitutionGroup="AbstractFeatureGroup"/>
+    <xs:complexType name="ImageType" final="#all">
+        <xs:complexContent>
+            <xs:extension base="AbstractWorldFeatureType">
+                <xs:sequence>
+                    <xs:element ref="filename" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="ImageGroup" type="ImageGroupType" substitutionGroup="AbstractContainerGroup"/>
+    <xs:complexType name="ImageGroupType" final="#all">
+        <xs:complexContent>
+            <xs:extension base="AbstractContainerType">
+                <xs:sequence>
+                    <xs:element ref="Image" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Placemark" type="PlacemarkType" substitutionGroup="AbstractWorldFeatureGroup"/>
+    <xs:complexType name="PlacemarkType" final="#all">
+        <xs:complexContent>
+            <xs:extension base="AbstractWorldFeatureType">
+                <xs:sequence>
+                    <xs:element ref="AbstractExpireTimeGroup" minOccurs="0" maxOccurs="1"/>
+                    <xs:element ref="AbstractGeometryGroup" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="AbstractContainerGroup" type="AbstractContainerType" abstract="true"
+        substitutionGroup="AbstractFeatureGroup"/>
+    <xs:complexType name="AbstractContainerType" abstract="true">
+        <xs:complexContent>
+            <xs:extension base="AbstractFeatureType"> </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="Group" type="GroupType" abstract="false"
+        substitutionGroup="AbstractFeatureGroup"/>
+    <xs:complexType name="GroupType" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="AbstractContainerType"> 
+                <xs:sequence>
+                    <xs:element ref="AbstractFeatureGroup" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+                <xs:attribute ref="groupType" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name = "Object" type="ObjectType" abstract="false" substitutionGroup="AbstractObjectGroup"/>
+    <xs:complexType name="ObjectType" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="AbstractContainerType"> 
+                <xs:sequence>
+                    <xs:element ref="AbstractObjectGroup" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="type" type="objectType" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>
+

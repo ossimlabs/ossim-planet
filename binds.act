@@ -1,0 +1,26 @@
+#   // need to say something like this in C++ when create the iac (InteractionController)
+
+:iac tie x_mouse LON YAW
+:iac tie y_mouse LAT ZOOM PITCH
+
+:iac bind left_mousedown    {:navigator rotatestart}
+:iac bind left_mouseup      {:navigator rotatestop}
+:iac bind middle_mousedown    {:navigator losrotatestart}
+:iac bind middle_mouseup      {:navigator losrotatestop}
+:iac bind right_mousedown    {:navigator loszoomstart}
+:iac bind right_mouseup      {:navigator loszoomstop}
+:iac bind shift_middle_mousedown  {:navigator zoomstart}
+:iac bind shift_middle_mouseup    {:navigator zoomstop}
+:iac bind shift_right_mousedown   {:navigator lookstart}
+:iac bind shift_right_mouseup     {:navigator lookstop}
+:iac bind left_key            {:navigator flystart .015625 0}
+:iac bind right_key          {:navigator flystart -.015625 0.0}
+:iac bind down_key          {:navigator flystart 0.0 .015625}
+:iac bind up_key         {:navigator flystart 0.0 -.015625}
+:iac bind u_key 	    {:navigator resetzoomlook}
+:iac bind z_key 	    {:navigator recordanimation}
+:iac bind Z_key 	    {:navigator playanimation}
+:iac bind p_key     	    {:navigator printlatlonelev}
+:iac bind P_key     	    {:navigator printlookcoordinates}
+:iac bind space_key         {:navigator reset}
+:iac bind return_key        {:navigator stop}

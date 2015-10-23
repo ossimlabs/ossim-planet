@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="pathCoordinatesType">
+        <xs:list itemType="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="orientationType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="lsrhpr"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="positionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="latlonhgt"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="timeUnitEnumType" >
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="seconds"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:element name="GeospatialPath" type="GeospatialPathType"/>
+    <xs:complexType name="GeospatialPathType">
+        <xs:sequence>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="coordinates" type="pathCoordinatesType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="name" use="optional"/>
+        <xs:attribute name="id" use="optional"/>
+        <xs:attribute name="refId" use="optional"/>
+        <xs:attribute name="timeUnit" type="timeUnitEnumType" use="required"/>
+        <xs:attribute name="positionType" type="positionType" use="required"/>
+        <xs:attribute name="orientationType" type="orientationType" use="required"/>
+        <xs:attribute name="timestamp" type="xs:dateTime" use="optional"/>
+        <xs:attribute name="duration" type="xs:duration" use="optional"/>
+    </xs:complexType>
+    <xs:element name="AnimationPath" type="AnimationPathType" abstract="false"/>
+    <xs:complexType name="AnimationPathType" abstract="false">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1"/>            
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>    
+            <xs:element ref="GeospatialPath" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="refId" type="xs:string" use="optional"/> 
+        <xs:attribute name="id" type="xs:string" use="optional"/> 
+        <xs:attribute name="parentId" type="xs:string" use="optional"/> 
+        <xs:attribute name="timeScale" type="xs:double" use="optional"/>
+        <xs:attribute name="timeOffset" type="xs:duration" use="optional"/>
+    </xs:complexType>
+</xs:schema>
