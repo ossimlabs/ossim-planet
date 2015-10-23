@@ -105,7 +105,7 @@ OSSIM_LINK_LIBRARY(${LIB_NAME} COMPONENT_NAME ossim TYPE "${OSSIM_USER_DEFINED_D
 
 
 ############################################################# SETUP APPLICATIONS ##################################################
-set(TARGET_COMMON_LIBRARIES ossimPlanet ${OSSIMVIDEO_LIBRARIES})
+set(TARGET_COMMON_LIBRARIES ${LIB_NAME} ${OSSIMVIDEO_LIBRARIES})
 FILE(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/examples/ossimplanetviewer/*.cpp")
 OSSIM_SETUP_APPLICATION(ossimplanetviewer INSTALL COMMAND_LINE COMPONENT_NAME ossim SOURCE_FILES ${SOURCE_FILES})
 FILE(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/examples/ossimplanettest/*.cpp")
