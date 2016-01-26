@@ -241,12 +241,14 @@ void CURRENT_CLASS::apply(osg::Geode &geode)
       {
         drawable = geode.getDrawable(i);
 
-        const osg::BoundingBox &bb = drawable->getBound();
-        if(bb.valid())
+        osg::BoundingSphere bs = drawable->getBound();
+        if(bs.valid())
         {
           // Make sure drawable will be visible in the scene
-          if(!_localFrusta.back().contains(bb)) continue;
+          if(!_localFrusta.back().contains(bs)) continue;
 
+          osg::BoundingBox bb;
+          bb.expandBy(bs);
           // Compute near/far distances for current drawable
           zNear = distance(bb.corner(_bbCorners.back().first), 
                                _viewMatrices.back());
