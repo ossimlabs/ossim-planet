@@ -126,11 +126,17 @@ ossimPlanetTextureLayerStateCode ossimPlanetDtedElevationDatabase::open(const st
                               if(!in.fail())
                               {
                                  
-                                 ossimDtedVol vol(in);
-                                 ossimDtedHdr hdr(in);
-                                 ossimDtedUhl uhl(in);
-                                 ossimDtedDsi dsi(in);
-                                 ossimDtedAcc acc(in);
+                                 ossimDtedVol vol;
+                                 ossimDtedHdr hdr;
+                                 ossimDtedUhl uhl;
+                                 ossimDtedDsi dsi;
+                                 ossimDtedAcc acc;
+                                 vol.parse(in);
+                                 hdr.parse(in);
+                                 uhl.parse(in);
+                                 dsi.parse(in);
+                                 acc.parse(in);
+
                                  
                                  if(uhl.getErrorStatus() != ossimErrorCodes::OSSIM_ERROR)
                                  {
@@ -561,9 +567,13 @@ osg::ref_ptr<ossimPlanetDtedElevationDatabase::DtedInfo> ossimPlanetDtedElevatio
 
    if(in.fail()) return 0;
 
-   ossimDtedVol vol(in);
-   ossimDtedHdr hdr(in);
-   ossimDtedUhl uhl(in);
+   ossimDtedVol vol;
+   ossimDtedHdr hdr;
+   ossimDtedUhl uhl;
+
+   vol.parse(in);
+   hdr.parse(in);
+   uhl.parse(in);
 
    in.close();
    
