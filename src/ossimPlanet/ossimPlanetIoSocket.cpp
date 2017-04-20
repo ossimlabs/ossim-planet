@@ -478,7 +478,6 @@ bool ossimPlanetIoSocket::pushMessage(osg::ref_ptr<ossimPlanetMessage> message, 
          {
             OutQueueType::iterator iter2 = theOutQueue.erase(iter);
             theOutQueue.insert(iter2, message);
-            std::cout << "REPLACING!!!!!" << std::endl;
             return result;
          }
          ++iter;

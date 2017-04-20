@@ -1,3 +1,4 @@
+#include <ossimPlanet/ossimPlanetDestinationCommandAction.h>
 #include <ossimPlanet/ossimPlanetTextureLayerRegistry.h>
 #include <ossim/base/ossimFilename.h>
 #include <ossim/base/ossimEnvironmentUtility.h>
@@ -45,6 +46,37 @@
 
 #include <osg/Geode>
 #include <osg/Geometry>
+
+void viewGotoLatLon( const ossimString& str )
+{
+   if ( !str.empty() )
+   {
+      ossimString formattedString = str;
+      ossimString lat, lon, height;
+
+      if(str.contains(","))
+      {
+        std::vector<ossimString> result;
+        str.split(result,",");
+        formattedString = ossimString().join(result, " ");
+      }
+      std::istringstream in(formattedString.c_str());
+
+      in >> lat >> lon >> height;
+      lat = lat.trim();
+      lon = lon.trim();
+      height = height.trim();
+      if(height.empty())
+      {
+         ossimPlanetDestinationCommandAction(":navigator gotolatlonnadir " + lat + " " + lon).execute(); 
+      }
+      else
+      {
+         ossimPlanetDestinationCommandAction(":navigator gotolatlonelevnadir " + lat + " " + lon + " " + height).execute(); 
+      }
+   }   
+}
+
 void setUpViewForMultipipeTest(ossimPlanetViewer& viewer, ossim_uint32 numberOfPipes)
 {
    //unsigned int width = 640, height = 480, aspectRatio = 1.33;
@@ -249,6 +281,7 @@ int main(int argc, char* argv[])
    arguments.getApplicationUsage()->addCommandLineOption("--time-offset", "time offset");
    arguments.getApplicationUsage()->addCommandLineOption("--lockview-path", "lock the view to the path");
    arguments.getApplicationUsage()->addCommandLineOption("--add-ephemeris", "Adds the ephemeris defaults");
+   arguments.getApplicationUsage()->addCommandLineOption("--goto-latlonelev", "goes to the lat lon elev.  Must be surrounded by quotes \"45 -123 45000\"");
 
 
 
@@ -296,6 +329,7 @@ int main(int argc, char* argv[])
    bool addCloud = false;
    bool lockViewToPathFlag = false;
    bool addEphemerisFlag = false;
+   ossimString gotoLatLon;
    if(arguments.read("--lockview-path", stringParam))
    {
       lockViewToPathFlag =tempString.toBool();
@@ -335,6 +369,10 @@ int main(int argc, char* argv[])
    if(arguments.read("--fog-near", stringParam))
    {
       fogNear = tempString.toDouble();
+   }
+   if(arguments.read("--goto-latlonelev", stringParam))
+   {
+      gotoLatLon = tempString;
    }
    while(arguments.read("--add-kml", stringParam))
    {
@@ -732,6 +770,10 @@ if(addEphemerisFlag)
    if(lockNode.get())
    {
       manipulator->viewMatrixBuilder()->updateFromNode(lockNode.get());
+   }
+   if(!gotoLatLon.empty())
+   {
+      viewGotoLatLon(gotoLatLon);
    }
    while(!viewer.done())
    {
