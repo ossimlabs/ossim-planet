@@ -269,9 +269,10 @@ osgDB::ReaderWriter::ReadResult ossimPlanetKmlLayerReaderWriter::readImage(const
    }
    if(theCurrentPlwLocation.exists())
    {
-      ossimFilename tempInputFile(fileName);
-      tempInputFile.convertBackToForwardSlashes();
-      ossimFilename file = theCurrentPlwLocation.dirCat(tempInputFile);
+      // ossimFilename tempInputFile(fileName);
+      // tempInputFile.convertBackToForwardSlashes();
+      // ossimFilename file = theCurrentPlwLocation.dirCat(tempInputFile);
+      ossimFilename file = theCurrentPlwLocation.dirCat(fileName);
       if(file.exists())
       {
          theRecurseFlag = true;
