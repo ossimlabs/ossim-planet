@@ -6,7 +6,7 @@
 #include <deque>
 #include <osg/Timer>
 #include <ossimPlanet/ossimPlanetExport.h>
-#include <OpenThreads/Mutex>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetIoSocket : public ossimPlanetIo
 {
@@ -71,13 +71,13 @@ protected:
    
    // The In queue is where incoming messages are stored and will be popped and handled in the thread
    //
-   ossimPlanetReentrantMutex      theInQueueMutex;
+   mutable std::recursive_mutex      theInQueueMutex;
    std::queue<osg::ref_ptr<ossimPlanetMessage> >   theInQueue;
 
    // The out queue will hold all outgoing messages
-   ossimPlanetReentrantMutex      theOutQueueMutex;
+   mutable std::recursive_mutex     theOutQueueMutex;
    OutQueueType                     theOutQueue;
-   ossimPlanetReentrantMutex      theOutBufferMutex;
+   mutable std::recursive_mutex     theOutBufferMutex;
    std::vector<char>                theOutBuffer;
 
    /**
@@ -100,7 +100,7 @@ protected:
     */ 
    ossim_uint32                   theAutoReconnectInterval; // specified in milliseconds
 
-   mutable ossimPlanetReentrantMutex     theMaxBytesToSendPerIoMutex;
+   mutable std::recursive_mutex   theMaxBytesToSendPerIoMutex;
    ossim_uint32                   theMaxBytesToSendPerIo;
 
    ossim_uint32                   theMaxOutgoingBacklogInBytes;
@@ -113,9 +113,9 @@ protected:
     */ 
    osg::Timer_t                   theLastTick;
 
-   ossimPlanetReentrantMutex    theSocketMutex;
+   mutable std::recursive_mutex   theSocketMutex;
 	
-	bool                           theFirstReadFlag;
+	bool                            theFirstReadFlag;
    
    /**
     * Bytes to auto send on connection

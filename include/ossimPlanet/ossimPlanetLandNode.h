@@ -3,7 +3,6 @@
 #include <osg/PagedLOD>
 #include <osg/Texture2D>
 #include <osg/CoordinateSystemNode>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossimPlanet/ossimPlanetLandGridNode.h>
 #include <ossimPlanet/ossimPlanetPagedRequestNode.h>
 #include <osg/Array>
@@ -70,7 +69,7 @@ protected:
    bool                                    theElevationChangedFlag;
    osg::ref_ptr<ossimPlanetLandSettings>     theLandSettings;
    
-   mutable ossimPlanetReentrantMutex theMutex;
+   mutable std::recursive_mutex theMutex;
    mutable osg::ref_ptr<osg::Geometry> theGeometry;
 
    mutable bool theAddAllChildrenFlag;

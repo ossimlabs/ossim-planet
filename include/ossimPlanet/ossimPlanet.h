@@ -15,7 +15,7 @@
 #include <ossimPlanet/ossimPlanetSousaLayer.h>
 #include <ossimPlanet/ossimPlanetActionReceiver.h>
 #include <ossimPlanet/ossimPlanetXmlAction.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
+#include <mutex>
 
 class ossimPlanetLand;
 class OSSIMPLANET_DLL ossimPlanet : public osg::MatrixTransform,
@@ -68,12 +68,12 @@ public:
 	void resetAllRedrawFlags();
    void setRedrawFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theRedrawFlag = flag;
    }
    bool redrawFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theRedrawFlag;
    }
    /**
@@ -115,13 +115,13 @@ protected:
    osg::Vec3d theNadirLatLonHeightPoint;
    osg::Vec3d theLineOfSiteLatLonHeightPoint;
    osg::Vec3d theEyePositionLatLonHeight;
-   mutable ossimPlanetReentrantMutex theTraversalMutex;
-   mutable ossimPlanetReentrantMutex thePropertyMutex;
+   mutable std::recursive_mutex theTraversalMutex;
+   mutable std::recursive_mutex thePropertyMutex;
    osg::ref_ptr<ossimPlanetGeoRefModel> theModel;
    osg::Vec3d theLsrHeadingPitchRoll;
    osg::ref_ptr<ossimPlanet::LayerListener> theLayerListener;
    
-   ossimPlanetReentrantMutex theLayersToAddListMutex;
+   std::recursive_mutex theLayersToAddListMutex;
    // Internal list that is maintained through creation of layers through the
    // recever commands.  It will be synched to the graph on next Update visitation
    //

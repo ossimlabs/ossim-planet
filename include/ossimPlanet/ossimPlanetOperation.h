@@ -1,7 +1,6 @@
 #ifndef ossimPlanetOperation_HEADER
 #define ossimPlanetOperation_HEADER
 #include <OpenThreads/Thread>
-#include <OpenThreads/ScopedLock>
 #include <osg/Referenced>
 #include <osg/ref_ptr>
 #include <vector>
@@ -13,7 +12,7 @@
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossim/base/ossimString.h>
 #include <iostream>
-
+#include <mutex>
 
 class ossimPlanetOperation;
 class ossimPlanetOperationThreadQueue;
@@ -73,38 +72,38 @@ public:
    }
    bool operator < (const ossimPlanetOperation& rhs)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return (thePriority < rhs.thePriority);
    }
    bool operator < (const osg::ref_ptr<ossimPlanetOperation> rhs)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return (thePriority < rhs->thePriority);
    }
    bool operator < (const ossimPlanetOperation* rhs)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return (thePriority < rhs->thePriority);
    }
    bool operator > (const ossimPlanetOperation& rhs)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return (thePriority > rhs.thePriority);
    }
    bool operator > (const ossimPlanetOperation* rhs)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return (thePriority > rhs->thePriority);
    }
    bool operator > (const osg::ref_ptr<ossimPlanetOperation> rhs)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return (thePriority > rhs->thePriority);
    }
    void setName(const ossimString& name)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+         std::lock_guard<std::mutex> lock(thePropertyMutex);
          theName = name;
       }
       notifyPropertyChanged("name");
@@ -112,26 +111,26 @@ public:
 	
    const ossimString& name()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theName;
    }
    void setId(const ossimString& id)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+         std::lock_guard<std::mutex> lock(thePropertyMutex);
          theId = id;
       }
       notifyPropertyChanged("id");
    }
 	const ossimString& id()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theId;
    }
 	void setState(StateType state)
 	{
 		{
-			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+			std::lock_guard<std::mutex> lock(thePropertyMutex);
 			theState = state;
 		}
 		switch(state)
@@ -160,19 +159,19 @@ public:
 	}
    bool isStopped()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return ((theState == CANCELED_STATE)||
               (theState == FINISHED_STATE));
    }
 	virtual StateType state()const
 	{
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
 		return theState;
 	}
    virtual void release(){}
    void addDependency(ossimPlanetOperation* operation)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theDependencyListMutex);
+      std::lock_guard<std::mutex> lock(theDependencyListMutex);
       List::iterator iter = std::find(theDependencyList.begin(),
                                       theDependencyList.end(),
                                       operation);
@@ -183,7 +182,7 @@ public:
    }
    void removeDependency(ossimPlanetOperation* operation)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theDependencyListMutex);
+      std::lock_guard<std::mutex> lock(theDependencyListMutex);
       List::iterator iter = std::find(theDependencyList.begin(),
                                       theDependencyList.end(),
                                       operation);
@@ -194,41 +193,41 @@ public:
    }
    bool hasDependency()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theDependencyListMutex);
+      std::lock_guard<std::mutex> lock(theDependencyListMutex);
       return (theDependencyList.size() > 0);
    }
    ossimPlanetOperation::List& dependencyList()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theDependencyList;
    }
    const ossimPlanetOperation::List& dependencyList()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theDependencyList;
    }
    void setPriority(ossimPlanetOperation::Priority priority)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+         std::lock_guard<std::mutex> lock(thePropertyMutex);
          thePriority = priority;
       }
       notifyPriorityChanged();
    }
    virtual ossimPlanetOperation::Priority priority()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return thePriority;
    }
    virtual void status(ossimString& result)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       result = theStatus;
    }
    virtual void setStatus(const ossimString& value)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+         std::lock_guard<std::mutex> lock(thePropertyMutex);
          theStatus = value;
       }
       notifyPropertyChanged("status");
@@ -243,14 +242,14 @@ public:
 	{
 		setState(CANCELED_STATE);
 	}
-   OpenThreads::Mutex& runMutex(){return theRunMutex;}
+   std::mutex& runMutex(){return theRunMutex;}
    virtual void reset()
    {
 		setState(READY_STATE);
    }
 	virtual void start()
 	{
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRunMutex);
+      std::lock_guard<std::mutex> lock(theRunMutex);
 		setState(RUN_STATE);
 		run();
 		if(state() == RUN_STATE) // if it wasn't canceled or set to some other state then say it has finished
@@ -267,14 +266,11 @@ protected:
 	void notifyPropertyChanged(const ossimString& name);
    virtual void run()=0;
 	
-   //mutable ossimPlanetReentrantMutex theRunMutex;
-   //mutable ossimPlanetReentrantMutex thePropertyMutex;
-   mutable OpenThreads::Mutex theRunMutex;
-   mutable OpenThreads::Mutex thePropertyMutex;
+   mutable std::mutex theRunMutex;
+   mutable std::mutex thePropertyMutex;
    bool theFinishedFlag;
    bool theCanceledFlag;
-   //mutable ossimPlanetReentrantMutex theDependencyListMutex;
-   mutable OpenThreads::Mutex theDependencyListMutex;
+   mutable std::mutex theDependencyListMutex;
    ossimPlanetOperation::List theDependencyList;
    ossimString theName;
    ossimString theId;
@@ -301,7 +297,7 @@ public:
    bool empty()const;
    ossim_uint32 size()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+      std::lock_guard<std::mutex> lock(theOperationQueueMutex);
       return theOperationQueue.size();
    }
 protected:
@@ -312,8 +308,7 @@ protected:
    bool hasOperation(ossimPlanetOperation* operation);
    osg::ref_ptr<ossimPlanetRefBlock> theBlock;
   
-  // mutable ossimPlanetReentrantMutex theOperationQueueMutex;
-   mutable OpenThreads::Mutex theOperationQueueMutex;
+   mutable std::mutex theOperationQueueMutex;
    ossimPlanetOperation::List theOperationQueue;
 };
 
@@ -376,7 +371,7 @@ public:
    virtual int cancel();
    bool empty()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+      std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
       return theOperationQueue->empty();
    }
 protected:
@@ -384,7 +379,7 @@ protected:
    virtual osg::ref_ptr<ossimPlanetOperation> nextOperation();
    
    bool                                    theDoneFlag;
-   mutable ossimPlanetReentrantMutex       theThreadMutex;
+   mutable std::recursive_mutex            theThreadMutex;
    osg::ref_ptr<ossimPlanetOperationQueue> theOperationQueue;
    osg::ref_ptr<ossimPlanetOperation>      theCurrentOperation;
    
@@ -415,7 +410,7 @@ public:
    void removeAllOperations();
 	void cancelCurrentOperation();
 protected:
-   ossimPlanetReentrantMutex             theThreadMutex;
+   std::recursive_mutex                    theThreadMutex;
    osg::ref_ptr<ossimPlanetOperationQueue> theOperationQueue;
 	ThreadQueueList theThreadQueueList;
 };

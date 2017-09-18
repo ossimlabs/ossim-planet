@@ -1,8 +1,8 @@
 #ifndef ossimPlanetPointModel_HEADER
 #define ossimPlanetPointModel_HEADER
 #include <ossimPlanet/ossimPlanetAnnotationLayerNode.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossimPlanet/ossimPlanetLsrSpaceTransform.h>
+#include <mutex>
 
 /**
  * This will be the root class to handle all point based models.  
@@ -127,7 +127,7 @@ protected:
    /**
     * General mutex to sync access to the parameters with other threads.
     */
-   ossimPlanetReentrantMutex thePointModelPropertyMutex;
+   std::recursive_mutex thePointModelPropertyMutex;
    
    /**
     * The Local space node will be added to the LsrSpace transform.

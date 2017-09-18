@@ -9,7 +9,7 @@
 #include <ossimPlanet/ossimPlanetAnnotationLayerNode.h>
 #include <ossimPlanet/ossimPlanetOperation.h>
 #include <queue>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetAnnotationLayer : public ossimPlanetLayer
 {
@@ -69,10 +69,10 @@ protected:
 	osg::ref_ptr<osgText::Font> theDefaultFont;
 	osg::ref_ptr<osg::Image> theDefaultIconImage;
 	osg::ref_ptr<osg::Texture2D> theDefaultIconTexture;
-	mutable ossimPlanetReentrantMutex theGraphMutex;
+	mutable std::recursive_mutex theGraphMutex;
    
 	
-	ossimPlanetReentrantMutex theNodesToRemoveListMutex;
+	mutable std::recursive_mutex theNodesToRemoveListMutex;
 	NodeListType theNodesToRemoveList;
 	
    osg::ref_ptr<ossimPlanetOperationThreadQueue> theStagingThreadQueue;

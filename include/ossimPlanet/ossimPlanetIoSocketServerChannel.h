@@ -3,7 +3,6 @@
 #include <ossimPlanet/netChannel.h>
 #include <ossimPlanet/ossimPlanetIo.h>
 #include <ossim/base/ossimConstants.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <osg/ref_ptr>
 #include <queue>
 #include <ossimPlanet/ossimPlanetExport.h>
@@ -84,14 +83,14 @@ protected:
    int  thePort;
    std::string theIoType;
    bool theIsTcp;
-   ossimPlanetReentrantMutex theIoListMutex;
+   std::recursive_mutex theIoListMutex;
    std::vector<osg::ref_ptr<ossimPlanetIo> > theIoList;
-   ossimPlanetReentrantMutex        theInQueueMutex;
+   std::recursive_mutex        theInQueueMutex;
    std::queue<osg::ref_ptr<ossimPlanetMessage> >   theInQueue;
    bool                           theAutoReconnectFlag;
    ossim_uint32                   theAutoReconnectInterval; // specified in milliseconds
    osg::Timer_t                   theLastTick;
-   ossimPlanetReentrantMutex        theSocketMutex;
+   std::recursive_mutex        theSocketMutex;
 };
 
 

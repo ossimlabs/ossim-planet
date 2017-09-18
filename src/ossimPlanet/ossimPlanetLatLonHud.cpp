@@ -14,9 +14,9 @@
 #include <osg/PolygonMode>
 #include <osgUtil/CullVisitor>
 #include <osgUtil/IntersectVisitor>
-#include <OpenThreads/ScopedLock>
 #include <ossim/base/ossimDms.h>
 #include <osgGA/EventVisitor>
+#include <mutex>
 
 class ossimPlanetLatLonHudUpdateCallback : public osg::NodeCallback
 {
@@ -63,7 +63,7 @@ ossimPlanetLatLonHud::ossimPlanetLatLonHud()
 
 void ossimPlanetLatLonHud::traverse(osg::NodeVisitor& nv)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    if(!theEnableFlag) return;
    bool traverseChildren = theViewport.valid();
    if(!thePlanet)
@@ -416,13 +416,13 @@ osg::Vec4 ossimPlanetLatLonHud::getTextColor()const
 
 void ossimPlanetLatLonHud::setCrosshairColor(const osg::Vec4& color)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theCrosshairColor = color;
 }
 
 void ossimPlanetLatLonHud::setFont(const ossimString& fontFile)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theFontChanged = theFontName != fontFile;
    theFontName = fontFile;
    theFont = osgText::readFontFile(fontFile.c_str());
@@ -430,25 +430,25 @@ void ossimPlanetLatLonHud::setFont(const ossimString& fontFile)
 
 void ossimPlanetLatLonHud::setTextColor(const osg::Vec4& color)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theTextColor = color;
 }
 
 void ossimPlanetLatLonHud::setLatDisplayString(const ossimString& latDisplayString)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theLatDisplayString = latDisplayString;
 }
 
 void ossimPlanetLatLonHud::setLonDisplayString(const ossimString& lonDisplayString)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theLonDisplayString = lonDisplayString;
 }
 
 void ossimPlanetLatLonHud::setCharacterSize(float size)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theCharacterSizeDirtyFlag = size != theCharacterSize;
    theCharacterSize = size;
    
@@ -456,19 +456,19 @@ void ossimPlanetLatLonHud::setCharacterSize(float size)
 
 void ossimPlanetLatLonHud::setViewport(osg::ref_ptr<osg::Viewport> viewport)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theViewport = viewport;
 }
 
 void ossimPlanetLatLonHud::setAutoUpdateFlag(bool flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theAutoUpdateFlag = flag;
 }
 
 void ossimPlanetLatLonHud::setCompassTexture(const ossimFilename& compass)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    if(theCompass.valid())
    {
       theCompass->setCompassTexture(compass);
@@ -481,7 +481,7 @@ void ossimPlanetLatLonHud::setCompassTexture(const ossimFilename& compass)
 void ossimPlanetLatLonHud::setCompassTexture(const ossimFilename& ring,
                                              const ossimFilename& interior)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::mutex> lock(theMutex);
    if(theCompass.valid())
    {
       theCompass->setCompassTexture(ring, interior);

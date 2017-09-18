@@ -167,12 +167,12 @@ public:
     */
    const ossimPlanetGeoRefModel* geoRefModel()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theModel.get();
    }
    ossimPlanetGeoRefModel* geoRefModel()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theModel.get();
    }
    
@@ -220,37 +220,37 @@ public:
    
    void updateFromPositionLlh(const osg::Vec3d& llh)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theFromNode        = 0;
       theFromPositionLLH = llh;
    }
    void updateFromRange(double range)
    {
-     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+     std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
      theFromRange = range;
      setComputeViewMatrixFlag(true);
    }
    void updateFromRelativeHpr(const osg::Vec3d& hpr)
    {
-     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+     std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
      theFromRelativeHpr = hpr;
      setComputeViewMatrixFlag(true);
    }
    void updateFromHpr(const osg::Vec3d& hpr)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theFromHpr = hpr;
       setComputeViewMatrixFlag(true);
    }
    void updateFromRelativeOrientationFlag(int relativeOrientationFlag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theFromRelativeOrientationFlags = (OrientationFlags)relativeOrientationFlag;
       setComputeViewMatrixFlag(true);
    }
    void updateFromNode(osg::Node* node)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theFromNode = node;
       setComputeViewMatrixFlag(true);
    }
@@ -259,12 +259,12 @@ public:
     */
    osg::Node* fromNode()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theFromNode.get();
    }
    const osg::Vec3d& fromLocalDisplacement()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theFromDisplacement;
    }
    
@@ -276,7 +276,7 @@ public:
     */
    const osg::Vec3d& fromPositionLlh()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theFromPositionLLH;
    }
    
@@ -289,7 +289,7 @@ public:
     */
    const osg::Vec3d& fromRelativeHpr()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theFromRelativeHpr;
    }
    
@@ -298,7 +298,7 @@ public:
     */
    OrientationFlags fromRelativeOrientationFlags()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theFromRelativeOrientationFlags;
    }
    
@@ -318,7 +318,7 @@ public:
     */
    const osg::Vec3d& fromHpr()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theFromHpr;
    }
    
@@ -327,7 +327,7 @@ public:
     */
    double fromRange()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theFromRange;
    }
    
@@ -336,7 +336,7 @@ public:
     */
    const osg::Node* fromNode()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theFromNode.get();
    }
    
@@ -416,7 +416,7 @@ public:
     */
    void setAttitudeHpr(const osg::Vec3d& hpr)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theAttitudeHpr = hpr;
       setComputeViewMatrixFlag(true);
 
@@ -428,7 +428,7 @@ public:
     */
    const osg::Vec3d& attitudeHpr()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theAttitudeHpr;
    }
 
@@ -438,7 +438,7 @@ public:
     */
    bool toInformationSetFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theToInformationSetFlag;
    }
    /**
@@ -446,7 +446,7 @@ public:
     */
    osg::Node* toNode()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theToNode.get();
    }
 
@@ -455,7 +455,7 @@ public:
     */
    const osg::Node* toNode()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theToNode.get();
    }
 
@@ -466,7 +466,7 @@ public:
     */
    const osg::Vec3d& toPositionLlh()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theToPositionLLH;
    }
    
@@ -475,7 +475,7 @@ public:
     */
    const osg::Vec3d& toDisplacement()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theToDisplacement;
    }
    
@@ -483,7 +483,7 @@ public:
     */
    double toRange()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theToRange;
    }
 
@@ -500,7 +500,7 @@ public:
     */
    void setLookAxis(LookAxis axis)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theLookAxis = axis;
       setComputeViewMatrixFlag(true);
    }
@@ -509,7 +509,7 @@ public:
     */
    LookAxis lookAxis()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theLookAxis;
    }
 
@@ -540,12 +540,12 @@ public:
 
    void setFromInformationSetFlag(bool flag)
     {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theFromInformationSetFlag = flag;
     }
    void setToInformationSetFlag(bool flag)
     {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theToInformationSetFlag = flag;
     }
    
@@ -597,19 +597,19 @@ public:
    virtual void convertToAFromViewMatrix(bool flattenRangeFlag = false);
    void invalidateFrom()
    {
-     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+     std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
      theFromInformationSetFlag = false;
      theFromNode = 0;
    }
    void invalidateTo()
    {
-     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+     std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theToInformationSetFlag = false;
       theToNode = 0;
    }
    void invalidate()
    {
-     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+     std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
      theFromInformationSetFlag = false;
       theFromNode = 0;
       theToNode   = 0;
@@ -642,7 +642,7 @@ protected:
    /**
     * Thread sync mutex for multiple threads hitting the object.
     */
-   mutable OpenThreads::ReentrantMutex thePropertyMutex;
+   mutable std::recursive_mutex thePropertyMutex;
 
    /**
     * A referenced pointer to the current Model in planet.

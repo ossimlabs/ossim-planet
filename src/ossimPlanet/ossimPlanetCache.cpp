@@ -14,7 +14,7 @@ void ossimPlanetMemoryImageCache::shrink()
    while(exceedsMinCacheSize())
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+         std::lock_guard<std::mutex> lock(theMutex);
          t = timer->tick();
          TileMap::iterator iter = theTileCache.begin();
          TileMap::iterator currentToErase = iter;
@@ -53,7 +53,7 @@ void ossimPlanetMemoryImageCache::addOrUpdate(ossimPlanetImage* image)
    if(!get(tileId))
    {   
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+         std::lock_guard<std::mutex> lock(theMutex);
          TileInfo info;
          info.theImage = image;
          info.theTimeStamp = osg::Timer::instance()->tick();
@@ -66,7 +66,7 @@ void ossimPlanetMemoryImageCache::addOrUpdate(ossimPlanetImage* image)
 ossimPlanetImage* ossimPlanetMemoryImageCache::get(const ossimPlanetTerrainTileId& id)
 {
    if(!enabledFlag()) return 0;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::mutex> lock(theMutex);
    TileMap::iterator tile = theTileCache.find(id);
    if(tile!=theTileCache.end())
    {
@@ -79,7 +79,7 @@ ossimPlanetImage* ossimPlanetMemoryImageCache::get(const ossimPlanetTerrainTileI
 
 bool ossimPlanetMemoryImageCache::hasImage(const ossimPlanetTerrainTileId& id)const
 {
-  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+  std::lock_guard<std::mutex> lock(theMutex);
   return (theTileCache.find(id) != theTileCache.end());
 }
 

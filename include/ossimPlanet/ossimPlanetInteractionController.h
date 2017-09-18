@@ -17,9 +17,8 @@
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossimPlanet/ossimPlanetDestinationCommandAction.h>
 #include <ossimPlanet/ossimPlanetXmlAction.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
-#include <OpenThreads/ScopedLock>
 #include <osg/ref_ptr>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetInteractionController : public ossimPlanetActionReceiver
 {
@@ -109,7 +108,7 @@ protected:
    DeviceList deviceList_;
 	// registered input devices 
    
-   mutable ossimPlanetReentrantMutex theBoundActionsMutex;
+   mutable std::recursive_mutex theBoundActionsMutex;
    std::map<std::string, osg::ref_ptr<ossimPlanetAction> > boundActions_;
 	// current event to action bindings
    

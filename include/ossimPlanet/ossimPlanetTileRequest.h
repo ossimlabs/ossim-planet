@@ -79,33 +79,33 @@ public:
    ossim_int32 frameNumberOfLastRequest()const{return theFrameNumberLastRequest;}
    void setFrameNumberOfLastRequest(ossim_int32 num)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theFrameNumberLastRequest = num;
    }
    bool isRequestCurrent(ossim_int32 frameNumber)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return ((frameNumber-theFrameNumberLastRequest)<=1);
    }
    void setTimestampFirstRequest(double timeStamp)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theTimestampFirstRequest = timeStamp;
       theTimestampLastRequest  = timeStamp;
    }
    double timeStampFirstRequest()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theTimestampFirstRequest;
    }
    void setTimestampLastRequest(double timeStamp)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theTimestampLastRequest = timeStamp;
    }
    double timestampLastRequest()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theTimestampLastRequest;
    }
    virtual void applyToGraph()
@@ -117,7 +117,7 @@ public:
    virtual bool populateCompileSet(osgUtil::IncrementalCompileOperation::ContextSet& contexts, 
                                    osgUtil::IncrementalCompileOperation::CompileSet& compileSet);
 protected:
-   mutable OpenThreads::Mutex thePropertyMutex;
+   mutable std::mutex thePropertyMutex;
    ossim_int32                theFrameNumberFirstRequest;
    double                     theTimestampFirstRequest;
    ossim_int32                theFrameNumberLastRequest;
@@ -204,7 +204,7 @@ public:
    virtual osg::ref_ptr<ossimPlanetOperation> nextOperation(bool blockIfEmptyFlag=true);
    void setCurrentFrameNumber(ossim_int32 num)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRequestQueueMutex);
+      std::lock_guard<std::mutex> lock(theRequestQueueMutex);
       theCurrentFrameNumber = num;
    }
    void setSortFlag(bool flag)
@@ -216,7 +216,7 @@ public:
       return theSortFlag;
    }
 protected:
-   OpenThreads::Mutex theRequestQueueMutex;
+   std::mutex theRequestQueueMutex;
    ossim_int32 theCurrentFrameNumber;
    bool theSortFlag;
 };
@@ -234,7 +234,7 @@ public:
    virtual void run();
    void setCurrentFrameNumber(ossim_int32 num)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRequestThreadQueueMutex);
+      std::lock_guard<std::mutex> lock(theRequestThreadQueueMutex);
       theCurrentFrameNumber = num;
       ossimPlanetTileRequestQueue* tileQueue = dynamic_cast<ossimPlanetTileRequestQueue*>(operationQueue());
       if(tileQueue)
@@ -248,7 +248,7 @@ public:
    }
    //void applyToGraph(double availableTime=2.5);
 protected:
-   OpenThreads::Mutex theRequestThreadQueueMutex;
+   std::mutex theRequestThreadQueueMutex;
    ossim_int32 theCurrentFrameNumber;
 };
 

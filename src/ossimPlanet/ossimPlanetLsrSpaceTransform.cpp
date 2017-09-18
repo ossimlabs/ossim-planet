@@ -26,7 +26,7 @@ theInvLocalToWorld(src.theInvLocalToWorld)
 
 void ossimPlanetLsrSpaceTransform::setMatrix(const osg::Matrix& m)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    dirtyBound();
    theLocalToWorld = m;
    theInvLocalToWorld.invert(m);
@@ -35,7 +35,7 @@ void ossimPlanetLsrSpaceTransform::setMatrix(const osg::Matrix& m)
 
 void ossimPlanetLsrSpaceTransform::setModel(ossimPlanetGeoRefModel* model)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theModel = model;
    parametersToMatrix();
    dirtyBound();
@@ -43,7 +43,7 @@ void ossimPlanetLsrSpaceTransform::setModel(ossimPlanetGeoRefModel* model)
 
 void ossimPlanetLsrSpaceTransform::setHeadingPitchRoll(const osg::Vec3d& hpr)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theHpr = hpr;
    parametersToMatrix();
    dirtyBound();
@@ -51,7 +51,7 @@ void ossimPlanetLsrSpaceTransform::setHeadingPitchRoll(const osg::Vec3d& hpr)
 
 void ossimPlanetLsrSpaceTransform::setLatLonAltitude(const osg::Vec3d& value)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theLatLonAltitude = value;
    parametersToMatrix();
    dirtyBound();
@@ -59,7 +59,7 @@ void ossimPlanetLsrSpaceTransform::setLatLonAltitude(const osg::Vec3d& value)
 
 void ossimPlanetLsrSpaceTransform::setLatLonAltitudeMeanSeaLevel(const osg::Vec3d& value)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(theModel.valid())
    {
       theLatLonAltitude = value;
@@ -71,7 +71,7 @@ void ossimPlanetLsrSpaceTransform::setLatLonAltitudeMeanSeaLevel(const osg::Vec3
 
 void ossimPlanetLsrSpaceTransform::setScale(const osg::Vec3d& value)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theScale = value;
    parametersToMatrix();
    dirtyBound();
@@ -79,7 +79,7 @@ void ossimPlanetLsrSpaceTransform::setScale(const osg::Vec3d& value)
 
 void ossimPlanetLsrSpaceTransform::setXYZ(const osg::Vec3d& xyz)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(theModel.valid())
    {
       theXYZ = xyz;
@@ -91,7 +91,7 @@ void ossimPlanetLsrSpaceTransform::setXYZ(const osg::Vec3d& xyz)
 
 void ossimPlanetLsrSpaceTransform::traverse(osg::NodeVisitor& nv)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    switch(nv.getVisitorType())
    {
       case osg::NodeVisitor::UPDATE_VISITOR:
@@ -153,7 +153,7 @@ void ossimPlanetLsrSpaceTransform::matrixToParameters(const osg::Matrix& inputM)
 
 bool ossimPlanetLsrSpaceTransform::computeLocalToWorldMatrix(osg::Matrix& matrix,osg::NodeVisitor* nv) const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if (_referenceFrame==RELATIVE_RF)
    {
       matrix.preMult(theLocalToWorld);
@@ -167,7 +167,7 @@ bool ossimPlanetLsrSpaceTransform::computeLocalToWorldMatrix(osg::Matrix& matrix
 
 bool ossimPlanetLsrSpaceTransform::computeWorldToLocalMatrix(osg::Matrix& matrix,osg::NodeVisitor* nv) const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if (_referenceFrame==RELATIVE_RF)
    {
       matrix.postMult(theInvLocalToWorld);
@@ -194,7 +194,7 @@ bool ossimPlanetLsrSpaceTransform::parametersToMatrix()
 
 void ossimPlanetLsrSpaceTransform::notifyLsrSpaceChanged()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx = 0;
    ossim_uint32 upper = theCallbackList.size();

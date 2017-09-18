@@ -18,7 +18,7 @@
 // #include <ossimPlanet/ossimPlanetLatLonHud.h>
 #include <ossimPlanet/ossimPlanetGeoRefModel.h>
 
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 ossimPlanet::LayerListener::LayerListener(ossimPlanet* planet)
 :thePlanet(planet)
 {
@@ -401,7 +401,7 @@ void ossimPlanet::xmlExecute(const ossimPlanetXmlAction& action)
 bool ossimPlanet::removeChildren(unsigned int pos,unsigned int numChildrenToRemove)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+      std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
       if(theBlockCallbacksFlag)
       {
          return osg::MatrixTransform::removeChildren(pos, numChildrenToRemove);
@@ -461,7 +461,7 @@ void ossimPlanet::childRemoved(unsigned int /*pos*/, unsigned int /*numChildrenT
 
 void ossimPlanet::notifyLayerAdded(ossimPlanetLayer* layer)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
 
    ossim_uint32 idx = 0;
@@ -476,7 +476,7 @@ void ossimPlanet::notifyLayerAdded(ossimPlanetLayer* layer)
 
 void ossimPlanet::notifyLayerRemoved(ossimPlanetLayer* layer)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx = 0;
    for(idx = 0; idx < theCallbackList.size(); ++idx)
@@ -491,7 +491,7 @@ void ossimPlanet::notifyLayerRemoved(ossimPlanetLayer* layer)
 
 void ossimPlanet::notifyNeedsRedraw(ossimPlanetNode* node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx = 0;
    ossim_uint32 upper = theCallbackList.size();

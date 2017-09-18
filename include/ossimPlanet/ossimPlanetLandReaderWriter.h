@@ -9,7 +9,6 @@
 #include "ossimPlanetGridUtility.h"
 #include <ossim/base/ossimString.h>
 #include <ossim/base/ossimFilename.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossimPlanet/ossimPlanetGeoRefModel.h>
 #include <ossimPlanet/ossimPlanetConstants.h>
 #include <ossimPlanet/ossimPlanetLandNormalType.h>
@@ -88,7 +87,7 @@ protected:
       ossimPlanetLandReaderWriterGeomType_GEOM    = 2,
       ossimPlanetLandReaderWriterGeomType_LOD     = 4
    };
-   mutable ossimPlanetReentrantMutex theMutex;
+   mutable std::recursive_mutex theMutex;
    ossim_uint32 theId;
    osg::ref_ptr<ossimPlanetGeoRefModel> theModel;
    ossimPlanetLandType theLandType;

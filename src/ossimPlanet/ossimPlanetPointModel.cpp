@@ -1,9 +1,9 @@
 #include <ossimPlanet/ossimPlanetPointModel.h>
 #include <ossimPlanet/ossimPlanetLayer.h>
 #include <ossimPlanet/mkUtils.h>
-#include <OpenThreads/ScopedLock>
 #include <ossim/base/ossimNotify.h>
 #include <osg/io_utils>
+#include <mutex>
 
 ossimPlanetPointModel::ossimPlanetPointModel()
 :theNodeChangedFlag(false)
@@ -38,7 +38,7 @@ void ossimPlanetPointModel::traverse(osg::NodeVisitor& nv)
          
  //        if(checkPointers())
          {
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePointModelPropertyMutex);
+            std::lock_guard<std::recursive_mutex> lock(thePointModelPropertyMutex);
             if(theNodeChangedFlag)
             {
                if(theLsrSpaceTransform->getNumChildren() > 0)
@@ -67,7 +67,7 @@ void ossimPlanetPointModel::traverse(osg::NodeVisitor& nv)
 
 void ossimPlanetPointModel::setNode(osg::Node* node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePointModelPropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePointModelPropertyMutex);
    setRedrawFlag(true);
   
    theNode = node;
@@ -76,7 +76,7 @@ void ossimPlanetPointModel::setNode(osg::Node* node)
 
 void ossimPlanetPointModel::copyLsrSpaceParameters(const ossimPlanetLsrSpaceTransform& lsr)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePointModelPropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePointModelPropertyMutex);
    // only need the martrix of the lsr space and all other parameters wil be derived from it.
    theLsrSpaceTransform->copyParametersOnly(lsr);
    setRedrawFlag(true);

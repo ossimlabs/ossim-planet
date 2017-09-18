@@ -1,10 +1,10 @@
 #ifndef ossimPlanetStandardTextureLayerFactory_HEADER
 #define ossimPlanetStandardTextureLayerFactory_HEADER
-#include <OpenThreads/Mutex>
 #include <ossimPlanet/ossimPlanetTextureLayerFactory.h>
 #include <ossim/base/ossimFilename.h>
 #include <ossim/base/ossimKeywordlist.h>
 #include <ossimPlanet/ossimPlanetExport.h>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetStandardTextureLayerFactory : public ossimPlanetTextureLayerFactory
 {
@@ -24,7 +24,7 @@ protected:
    osg::ref_ptr<ossimPlanetTextureLayer> createLayerFromOldKwl(const ossimKeywordlist& kwl,
                                                                const ossimString& prefix=ossimString())const;
    static ossimPlanetStandardTextureLayerFactory* theInstance;
-   mutable ossimPlanetReentrantMutex theMutex;
+   mutable std::recursive_mutex theMutex;
 };
 
 #endif

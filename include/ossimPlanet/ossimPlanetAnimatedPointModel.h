@@ -6,7 +6,7 @@
 #include <osg/MatrixTransform>
 #include <osg/Geometry>
 #include <osg/LineWidth>
-#include <OpenThreads/Mutex>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetAnimatedPointModel : public ossimPlanetAnnotationLayerNode 
 {
@@ -44,8 +44,8 @@ protected:
                    double timeMultiplier=1.0);
       virtual void operator()(osg::Node* node, osg::NodeVisitor* nv);
    };
-   OpenThreads::Mutex                     theUpdateCoordinatesMutex;
-   OpenThreads::Mutex                     theUpdateColorMutex;
+   std::mutex                     theUpdateCoordinatesMutex;
+   std::mutex                     theUpdateColorMutex;
    bool                                   theShowPathFlag;
    bool                                   theShowModelFlag;
    osg::Vec4f                             theAnimationPathColor;

@@ -79,7 +79,7 @@ void ossimPlanetOssimImageLayer::clearChains()
 ossimPlanetTextureLayerStateCode ossimPlanetOssimImageLayer::openImage(const ossimFilename& filename,
                                                                        ossim_int32 entryIdx)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    theViewInterface = 0;
    theFilename = "";
    theSource = 0;
@@ -114,7 +114,7 @@ ossimPlanetTextureLayerStateCode ossimPlanetOssimImageLayer::openImage(const oss
 
 ossimPlanetTextureLayerStateCode ossimPlanetOssimImageLayer::setCurrentEntry(ossim_int32 idx)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    theViewInterface = 0;
    theRenderer = 0;
    theCenterLat = 0.0;
@@ -157,7 +157,7 @@ ossim_uint32 ossimPlanetOssimImageLayer::getNumberOfEntries()const
 void ossimPlanetOssimImageLayer::setOverviewFile(const ossimFilename& filename)
 {
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+		std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
       theOverviewFile = filename;
       if(theSource.valid())
       {
@@ -185,7 +185,7 @@ void ossimPlanetOssimImageLayer::setOverviewFile(const ossimFilename& filename)
 void ossimPlanetOssimImageLayer::setHistogramFile(const ossimFilename& file)
 {
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+		std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
       theHistogramFile = file;
       if(theHistogramRemapper)
       {
@@ -208,7 +208,7 @@ void ossimPlanetOssimImageLayer::setHistogramStretchMode(const ossimString& mode
 {
    bool changed = false;
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+      std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
       
       if(mode == "None")
       {
@@ -250,7 +250,7 @@ void ossimPlanetOssimImageLayer::setHistogramStretchEnableFlag(bool flag)
 {
    bool changed = false;
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+      std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
       if(theHistogramRemapper)
       {
          theHistogramStretchEnableFlag = flag;
@@ -269,7 +269,7 @@ void ossimPlanetOssimImageLayer::setHistogramStretchEnableFlag(bool flag)
 
 ossimString ossimPlanetOssimImageLayer::histogramStretchMode()const
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+	std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    switch(theHistogramStretchMode)
    {
       case ossimHistogramRemapper::STRETCH_UNKNOWN:
@@ -368,7 +368,7 @@ ossimString ossimPlanetOssimImageLayer::getClassName()const
 
 ossimPlanetTextureLayerStateCode ossimPlanetOssimImageLayer::updateExtents()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    return updateExtentsNoMutex();
 }
 ossimPlanetTextureLayerStateCode ossimPlanetOssimImageLayer::updateExtentsNoMutex()
@@ -499,7 +499,7 @@ void ossimPlanetOssimImageLayer::resetStats()const
 
 ossimScalarType ossimPlanetOssimImageLayer::scalarType()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    if(theSource.valid())
    {
       return theSource->getOutputScalarType();
@@ -521,7 +521,7 @@ bool ossimPlanetOssimImageLayer::hasTexture(ossim_uint32 width,
    {
       updateExtents();
    }
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    if(!theInputProjection.valid() ||
       !theSource.valid())
    {
@@ -561,7 +561,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetOssimImageLayer::getTexture(ossim_uint
       updateExtents();
    }
    
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    if(!theInputProjection.valid() ||
       !theSource.valid())
    {
@@ -772,7 +772,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetOssimImageLayer::getTexture(ossim_uint
                                                                       ossim_uint64 col,
                                                                       const ossimPlanetGridUtility& utility)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    if(!getEnableFlag())
    {
       return 0;
@@ -781,7 +781,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetOssimImageLayer::getTexture(ossim_uint
    {
       updateExtents();
    }
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock2(theOssimImageLayerMutex);
    
    if(!theProjection.valid() ||
       !theSource.valid())
@@ -1217,7 +1217,7 @@ ossimRefPtr<ossimXmlNode> ossimPlanetOssimImageLayer::saveXml(bool /*recurseFlag
 
 bool ossimPlanetOssimImageLayer::loadXml(ossimRefPtr<ossimXmlNode> node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOssimImageLayerMutex);
+   std::lock_guard<std::mutex> lock(theOssimImageLayerMutex);
    blockCallbacks(true);
    bool result = false;
    ossimRefPtr<ossimXmlNode> filenameNode         = node->findFirstNode("filename");

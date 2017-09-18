@@ -15,7 +15,6 @@
 #include <osgUtil/SmoothingVisitor>
 #include <osgUtil/TriStripVisitor>
 #include <osgDB/Registry>
-#include <OpenThreads/ScopedLock>
 #include <ossimPlanet/ossimPlanetBoundingBox.h>
 #include <ossimPlanet/ossimPlanetLandTextureRequest.h>
 #include <ossimPlanet/ossimPlanetDatabasePager.h>
@@ -29,6 +28,7 @@
 #include <ossim/base/ossimEndian.h>
 #include <osgUtil/Simplifier>
 #include <ossim/base/ossimGeoidManager.h>
+#include <mutex>
 
 static ossim_uint32 landReaderWriterId = 0;
 
@@ -54,7 +54,7 @@ const char* ossimPlanetLandReaderWriter::className()const
 osgDB::ReaderWriter::ReadResult ossimPlanetLandReaderWriter::readNode(const std::string& filename, const Options* /* options */ )const
 {
 
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    if(!theModel.valid()) return 0;
   // std::cout << "ossimPlanetLandReaderWriter::readNode filename = " << filename << std::endl;
    osgDB::ReaderWriter::ReadResult result = 0;
@@ -490,7 +490,7 @@ bool ossimPlanetLandReaderWriter::getElevationEnabledFlag()const
 
 void ossimPlanetLandReaderWriter::setElevationEnabledFlag(bool elevationFlag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theElevationEnabledFlag = elevationFlag;
    
 }
@@ -502,7 +502,7 @@ ossim_float64 ossimPlanetLandReaderWriter::getHeightExag()const
 
 void ossimPlanetLandReaderWriter::setHeightExag(ossim_float64 exag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theHeightExag = exag;
 }
 
@@ -514,7 +514,7 @@ ossim_uint32 ossimPlanetLandReaderWriter::getElevationPatchSize()const
 
 void ossimPlanetLandReaderWriter::setElevationPatchSize(ossim_uint32 patchSize)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theElevationPatchSize = patchSize;
    if(!(theElevationPatchSize&1))
    {
@@ -531,7 +531,7 @@ ossim_uint32 ossimPlanetLandReaderWriter::getMaxLevelDetail()const
 
 void ossimPlanetLandReaderWriter::setMaxLevelDetail(ossim_uint32 maxLevelDetail)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theMaxLevelDetail = maxLevelDetail;
 }
 
@@ -543,13 +543,13 @@ ossimFilename ossimPlanetLandReaderWriter::getElevationCacheDir()const
 
 void ossimPlanetLandReaderWriter::setElevationCacheDir(const ossimFilename& cacheDir)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theElevationCacheDir = cacheDir;
 }
 
 void ossimPlanetLandReaderWriter::setGridUtility(ossimPlanetGridUtility* grid)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theGrid = grid; 
 }
 

@@ -117,7 +117,7 @@ protected:
    std::string theProxyPort;
    std::string theProxyUser;
    std::string theProxyPassword;
-   mutable ossimPlanetReentrantMutex theWmsArchiveMutex;
+   mutable std::recursive_mutex theWmsArchiveMutex;
    std::vector<ossimString>   theLayers;
    std::vector<ossimString>   theStyles;
    bool                       theAutoCreateCacheFlag;

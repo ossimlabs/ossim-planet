@@ -55,12 +55,12 @@ public:
    virtual void setTerrainTile(ossimPlanetTerrainTile* tile);
    ossimPlanetTerrainTile* terrainTile() 
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTerrainTileMutex);
+      std::lock_guard<std::mutex> lock(theTerrainTileMutex);
       return theTerrainTile; 
    }
    const ossimPlanetTerrainTile* terrainTile() const 
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTerrainTileMutex);
+      std::lock_guard<std::mutex> lock(theTerrainTileMutex);
       return theTerrainTile; 
    }
    
@@ -155,7 +155,7 @@ public:
    }
 protected:
    virtual ~ossimPlanetTerrainTechnique();
-   mutable OpenThreads::Mutex theTerrainTileMutex;
+   mutable std::mutex theTerrainTileMutex;
    /**
     * this ossimPlanetGeoRefModel will be replaced soon with a general
     * GeoRefModel

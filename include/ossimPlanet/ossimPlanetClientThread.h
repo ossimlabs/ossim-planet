@@ -10,7 +10,8 @@
 #include <ossimPlanet/sg_socket.h>
 #include <queue>
 #include <map>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
+#include <mutex>
+
 class OSSIMPLANET_DLL ossimPlanetClientConnection : public osg::Referenced
 {
 public:
@@ -39,8 +40,8 @@ public:
 
 protected:
    ossimString popMessage();
-   mutable ossimPlanetReentrantMutex theMutex;
-   mutable ossimPlanetReentrantMutex theMessageQueueMutex;
+   mutable std::recursive_mutex theMutex;
+   mutable std::recursive_mutex theMessageQueueMutex;
    SGSocket*                  theSocket;
    ossim_uint32               theMaxQueueSize;
    std::deque<ossimString>    theMessageQueue; 
@@ -85,7 +86,7 @@ protected:
    void protectedUpdateClientThreadBlock();
    
    typedef std::vector<osg::ref_ptr<ossimPlanetClientConnection> > ossimPlanetClientThreadConnectionList;
-   mutable ossimPlanetReentrantMutex            theConnectionListMutex;
+   mutable std::recursive_mutex            theConnectionListMutex;
    osg::ref_ptr<ossimPlanetRefBlock>  theBlock;
    bool                                  theStartedFlag;
    bool                                  theDoneFlag;

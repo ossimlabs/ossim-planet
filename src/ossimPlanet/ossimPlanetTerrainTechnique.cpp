@@ -124,7 +124,7 @@ ossimPlanetTerrainTechnique::~ossimPlanetTerrainTechnique()
 
 void ossimPlanetTerrainTechnique::setTerrainTile(ossimPlanetTerrainTile* tile)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTerrainTileMutex);
+   std::lock_guard<std::mutex> lock(theTerrainTileMutex);
    theTerrainTile = tile;
    if(theTerrainTile)
    {

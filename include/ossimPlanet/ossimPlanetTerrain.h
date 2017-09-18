@@ -23,6 +23,7 @@
 #include <set>
 #include <map>
 #include <queue>
+#include <mutex>
 
 /**
  *
@@ -287,55 +288,55 @@ public:
    }
    ossimPlanetImageCache* elevationCache()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theElevationCache.get();
    }
    const ossimPlanetImageCache* elevationCache()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theElevationCache.get();
    }
    
    bool priorityPointFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return thePriorityPointFlag;
    }
    void setPriorityPointFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       thePriorityPointFlag = flag;
    }
    void setPriorityPointXyz(const osg::Vec3d& pt)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       thePriorityPoint = pt;
    }
    const osg::Vec3d& priorityPoint()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return thePriorityPoint;
    }
 
    
    bool falseEyeFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theFalseEyeFlag;
    }
    void setFalseEyeFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theFalseEyeFlag = flag;
    }
    void setFalseEyeXyz(const osg::Vec3d& eye)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theFalseEye = eye;
    }
    const osg::Vec3d& falseEye()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theFalseEye;
    }
    
@@ -350,14 +351,14 @@ protected:
    osg::ref_ptr<ossimPlanetTerrainTechnique> theTerrainTechnique;
    ossim_int64 theLastApplyToGraphFrameNumber;
    ossim_uint32 theMaxNumberOfOperationsToApplyToGraphPerFrame;
-   mutable OpenThreads::Mutex          thePropertyMutex;
-   mutable OpenThreads::ReentrantMutex theRootLayersMutex;
-   mutable OpenThreads::ReentrantMutex theTextureQueueMutex;
-   mutable OpenThreads::ReentrantMutex theElevationQueueMutex;
-   mutable OpenThreads::ReentrantMutex theSplitQueueMutex;
-   mutable OpenThreads::ReentrantMutex theMergeQueueMutex;
+   mutable std::mutex          thePropertyMutex;
+   mutable std::recursive_mutex theRootLayersMutex;
+   mutable std::recursive_mutex theTextureQueueMutex;
+   mutable std::recursive_mutex theElevationQueueMutex;
+   mutable std::recursive_mutex theSplitQueueMutex;
+   mutable std::recursive_mutex theMergeQueueMutex;
    
-   mutable OpenThreads::ReentrantMutex theChildrenToRemoveMutex;
+   mutable std::recursive_mutex theChildrenToRemoveMutex;
    RemoveChildrenList theChildrenToRemove;
    
    bool theResetRootsFlag;
@@ -379,16 +380,16 @@ protected:
    osg::ref_ptr<ossimPlanetTileRequestThreadQueue> theSplitQueue;
    osg::ref_ptr<ossimPlanetTileRequestQueue> theMergeQueue;
    
-   OpenThreads::ReentrantMutex    theReadyToApplyToGraphQueueMutex;
+   std::recursive_mutex           theReadyToApplyToGraphQueueMutex;
    ossimPlanetTileRequest::List   theReadyToApplyToGraphQueue;
    ossimPlanetTileRequest::List   theReadyToApplyToGraphNewNodesQueue;
-   OpenThreads::ReentrantMutex    theNeedToCompileQueueMutex;
+   std::recursive_mutex           theNeedToCompileQueueMutex;
    ossimPlanetTileRequest::List   theNeedToCompileQueue;
       
    double theMaxTimeToSplit;
    double theMaxTimeToMerge;
-   mutable OpenThreads::ReentrantMutex theTileSetMutex;
-   mutable OpenThreads::ReentrantMutex theTileSetMapMutex;
+   mutable std::recursive_mutex theTileSetMutex;
+   mutable std::recursive_mutex theTileSetMapMutex;
    TileSet theTileSet;
    TileSetMap theTileSetMap;
    
@@ -402,7 +403,7 @@ protected:
    osg::ref_ptr<ossimPlanetImageCacheShrinkOperation> theElevationCacheShrinkOperation;
    osg::ref_ptr<ossimPlanetOperationThreadQueue> theCacheShrinkThreadQueue;
    
-   mutable OpenThreads::ReentrantMutex theRefreshExtentsMutex;
+   mutable std::recursive_mutex theRefreshExtentsMutex;
    osg::ref_ptr<ossimPlanetExtents> theRefreshImageExtent;
    osg::ref_ptr<ossimPlanetExtents> theRefreshElevationExtent;
 //   RefreshImageExtentsList     theRefreshImageExtentsList;

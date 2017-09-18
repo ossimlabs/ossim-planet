@@ -21,7 +21,7 @@
 #include <ossimPlanet/ossimPlanetKmlLayer.h>
 #include <ossimPlanet/ossimPlanetVisitors.h>
 #include <ossimPlanet/ossimPlanetEphemeris.h>
-#include <OpenThreads/Mutex>
+#include <mutex>
 
 class ossimPlanetManipulator;
 class ossimPlanetViewer;
@@ -473,7 +473,7 @@ protected:
    osg::ref_ptr<osg::Light> theSavedLight;
    osg::Timer_t theFrameStartTimeStamp;
    /***  These are Gui Action adapter bridge ****/
-   mutable OpenThreads::Mutex theActionAdapterMutex;
+   mutable std::mutex theActionAdapterMutex;
    bool theContinousUpdateFlag;
    bool theRedrawFlag;
    bool theWarpPointerFlag;

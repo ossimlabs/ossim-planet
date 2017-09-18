@@ -17,6 +17,7 @@
 #include <ossim/elevation/ossimElevManager.h>
 #include <ossim/projection/ossimLlxyProjection.h>
 #include <queue>
+
 class OSSIMPLANET_DLL ossimPlanetOssimImageLayer : public ossimPlanetTextureLayer
 {
 public:
@@ -364,7 +365,7 @@ protected:
    mutable double theCenterLat;
    mutable double theCenterLon;
    mutable double theLength;                   // approximate length in meters of the diagonal image
-   mutable OpenThreads::Mutex         theOssimImageLayerMutex;
+   mutable std::mutex         theOssimImageLayerMutex;
 };
 
 #endif

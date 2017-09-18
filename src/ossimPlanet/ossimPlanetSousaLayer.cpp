@@ -193,7 +193,7 @@ void ossimPlanetSousaLayer::xmlExecute(const ossimPlanetXmlAction &a)
 
 void ossimPlanetSousaLayer::threadedXmlExecute(const ossimPlanetXmlAction &a)
 {
-  // OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theXmlActionThreadQueueMutex);
+  // std::lock_guard<std::recursive_mutex> lock(theXmlActionThreadQueueMutex);
 
 	std::string command = a.command();
 	if(command == "Add")
@@ -267,7 +267,7 @@ void ossimPlanetSousaLayer::threadedXmlExecute(const ossimPlanetXmlAction &a)
 				}
             else if(tag == "Camera")
             {
-					OpenThreads::ScopedLock<OpenThreads::Mutex> testDelayLock(theCameraTestDelayMutex);
+					std::lock_guard<std::recursive_mutex> testDelayLock(theCameraTestDelayMutex);
                // let's set a 2 frame delay just in case the draw thread is already in the process of visiting us. So on the second visit
                // we will do a view chnge test
                //
@@ -431,7 +431,7 @@ void ossimPlanetSousaLayer::closeConnections()
 
 void ossimPlanetSousaLayer::traverse(osg::NodeVisitor& nv)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theUpdateMutex);
+	std::lock_guard<std::recursive_mutex> lock(theUpdateMutex);
    switch(nv.getVisitorType())
    {
       case osg::NodeVisitor::UPDATE_VISITOR:
@@ -471,7 +471,7 @@ void ossimPlanetSousaLayer::traverse(osg::NodeVisitor& nv)
                osg::Vec3d currentHpr(viewer->currentCamera()->heading(),
                                      viewer->currentCamera()->pitch(),
                                      viewer->currentCamera()->roll());
-               OpenThreads::ScopedLock<OpenThreads::Mutex> testDelayLock(theCameraTestDelayMutex);
+               std::lock_guard<std::recursive_mutex> testDelayLock(theCameraTestDelayMutex);
                if(theCameraTestDelay>0)
                {
                   theEyePosition    = currentEye;

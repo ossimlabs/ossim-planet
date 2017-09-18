@@ -6,8 +6,8 @@
 #include <osg/Image>
 #include <osg/Vec2>
 #include <ossim/base/ossimConstants.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossimPlanet/ossimPlanetTerrainTileId.h>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetImage :public osg::Image
 {
@@ -63,7 +63,7 @@ public:
    void fromOssimImageNoAlpha(ossimRefPtr<ossimImageData> data,
                               bool reassignNullFlag = true,
                               double nullValue = 0.0);
-   OpenThreads::Mutex& mutex()const;
+   std::recursive_mutex& mutex()const;
 
    bool hasMinMax()const
    {
@@ -176,7 +176,7 @@ protected:
    mutable ossimPlanetImageStateType theState;
    ossimPlanetTerrainTileId theTileId;
    ossimPlanetImagePixelStatus thePixelStatus;
-   mutable ossimPlanetReentrantMutex theMutex;
+   mutable std::recursive_mutex theMutex;
    std::vector<double> theMinValue;
    std::vector<double> theMaxValue;
    

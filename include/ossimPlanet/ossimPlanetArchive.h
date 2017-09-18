@@ -6,17 +6,15 @@
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossim/base/ossimFilename.h>
 #include <osg/Referenced>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
-#include <OpenThreads/ScopedLock>
 #include <ossimPlanet/ossimPlanetArchiveMapping.h>
-
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetArchive : public osg::Referenced
 {
 private:
 	bool useArchiveMapping;
 	std::vector<ossimPlanetArchiveMapping> mappingList;
-	mutable ossimPlanetReentrantMutex theArchiveMutex;
+	mutable std::recursive_mutex theArchiveMutex;
 
 public:
 	ossimPlanetArchive();

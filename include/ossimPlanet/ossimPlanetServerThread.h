@@ -7,10 +7,9 @@
 #include <osg/Referenced>
 #include <osg/ref_ptr>
 #include <OpenThreads/Thread>
-#include<ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossim/base/ossimConstants.h>
 #include <ossim/base/ossimString.h>
-
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetServerThread : public osg::Referenced,
                                                 public OpenThreads::Thread
@@ -59,9 +58,9 @@ public:
 protected:
    int findMessageHandler(ossimPlanetServerMessageHandler* handler)const;
    
-   mutable ossimPlanetReentrantMutex theMessageQueueMutex;
-   mutable ossimPlanetReentrantMutex theChannelListMutex;
-   mutable ossimPlanetReentrantMutex theMessageHandlerMutex;
+   mutable std::recursive_mutex theMessageQueueMutex;
+   mutable std::recursive_mutex theChannelListMutex;
+   mutable std::recursive_mutex theMessageHandlerMutex;
    ossim_uint32               thePollingRatePerSecond;
    ossim_uint32               theMaxQueueSize;
    std::queue<ossimString>    theMessageQueue;

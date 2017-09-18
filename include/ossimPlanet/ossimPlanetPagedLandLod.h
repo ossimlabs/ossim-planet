@@ -5,12 +5,12 @@
 #include <osg/PagedLOD>
 #include <osg/MatrixTransform>
 #include <osg/Geometry>
-#include <OpenThreads/ScopedLock>
 #include <ossim/base/ossimConstants.h>
 #include <ossimPlanet/ossimPlanetConstants.h>
 #include "ossimPlanet/ossimPlanetBoundingBox.h"
 #include <ossimPlanet/ossimPlanetLandTextureRequest.h>
 #include <ossimPlanet/ossimPlanetExport.h>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetPagedLandLodCullNode : public osg::MatrixTransform
 {
@@ -145,7 +145,7 @@ public:
    bool hasCulledChildren()const;
    bool areAllChildrenCulled(bool applyToAddedChildrenOnly=false)const;
    bool areAllChildrenLeaves()const;
-   OpenThreads::Mutex& mutex()const
+   std::recursive_mutex& mutex()const
    {
       return theMutex;
    }
@@ -169,10 +169,10 @@ protected:
    bool theCulledFlag;
    bool theRemoveChildrenFlag;
    ossimPlanetLandRefreshType theRefreshType;
-   mutable ossimPlanetReentrantMutex theMutex;
-   mutable ossimPlanetReentrantMutex thePagedLodListMutex;
-   mutable ossimPlanetReentrantMutex theChildCullNodeListMutex;
-   mutable ossimPlanetReentrantMutex theTextureRequestMutex;
+   mutable std::recursive_mutex theMutex;
+   mutable std::recursive_mutex thePagedLodListMutex;
+   mutable std::recursive_mutex theChildCullNodeListMutex;
+   mutable std::recursive_mutex theTextureRequestMutex;
    osg::ref_ptr<ossimPlanetPagedLandLodCullNode> theCullNode;
       
 /*    osg::Node* theTransform; */

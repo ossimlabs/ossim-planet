@@ -1,7 +1,7 @@
 #include <ossimPlanet/ossimPlanetServerThread.h>
-#include <OpenThreads/ScopedLock>
 #include <iostream>
 #include <osg/Timer>
+#include <mutex>
 
 ossimPlanetServerThread::ossimPlanetServerThread(ossim_uint32 maxQueueSize)
    :thePollingRatePerSecond(60),
@@ -50,7 +50,7 @@ void ossimPlanetServerThread::run()
             if(s!="")
             {
                // let's first try to see if the message could be handled immediately
-               OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageHandlerMutex);
+               std::lock_guard<std::recursive_mutex> lock(theMessageHandlerMutex);
                ossim_uint32 idx = 0;
                bool handledFlag = false;
                for(idx = 0; ((idx < theMessageHandlerList.size())&&!handledFlag); ++idx)
@@ -63,7 +63,7 @@ void ossimPlanetServerThread::run()
                //
                if(!handledFlag&&theQueueMessagesFlag)
                {
-                  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageQueueMutex);
+                  std::lock_guard<std::recursive_mutex> lock(theMessageQueueMutex);
                   theMessageQueue.push(s);
                   if(theMessageQueue.size() > theMaxQueueSize)
                   {
@@ -109,7 +109,7 @@ osg::ref_ptr<SGSocket> ossimPlanetServerThread::addServer(const ossimString& hos
    if(result->open(SG_IO_IN))
    {
       result->setReadlineDelimiter(delimiter);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChannelListMutex);
+      std::lock_guard<std::recursive_mutex> lock(theChannelListMutex);
       theChannelList.push_back(result);
    }
    else
@@ -128,7 +128,7 @@ osg::ref_ptr<SGSocket> ossimPlanetServerThread::addServer(const ossimString& hos
 
 osg::ref_ptr<SGSocket> ossimPlanetServerThread::removeServer(ossim_uint32 idx)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChannelListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theChannelListMutex);
    osg::ref_ptr<SGSocket> result;
    if(idx < theChannelList.size())
    {
@@ -152,7 +152,7 @@ osg::ref_ptr<SGSocket> ossimPlanetServerThread::removeServer(const ossimString& 
 {
    osg::ref_ptr<SGSocket> result;
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChannelListMutex);
+      std::lock_guard<std::recursive_mutex> lock(theChannelListMutex);
       ossim_uint32 idx = 0;
       for(idx = 0; idx < theChannelList.size(); ++idx)
       {
@@ -186,7 +186,7 @@ bool ossimPlanetServerThread::setServer(ossim_uint32 idx,
    {
       if(theChannelList[idx].valid())
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChannelListMutex);
+         std::lock_guard<std::recursive_mutex> lock(theChannelListMutex);
 //          delete theChannelList[idx];
 //          theChannelList[idx] = new SGSocket(host, port, portType);
          theChannelList[idx]->setSocket(host, port, portType);
@@ -256,7 +256,7 @@ ossim_uint32 ossimPlanetServerThread::getNumberOfServers()const
 bool ossimPlanetServerThread::nextMessage(ossimString& msg)
 {
    bool result = false;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageQueueMutex);
    if(!theMessageQueue.empty())
    {
       msg = theMessageQueue.front();
@@ -269,7 +269,7 @@ bool ossimPlanetServerThread::nextMessage(ossimString& msg)
 
 void ossimPlanetServerThread::addMessageHandler(osg::ref_ptr<ossimPlanetServerMessageHandler> messageHandler)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageHandlerMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageHandlerMutex);
    int idx = findMessageHandler(messageHandler.get());
 
    if(idx < 0)
@@ -280,7 +280,7 @@ void ossimPlanetServerThread::addMessageHandler(osg::ref_ptr<ossimPlanetServerMe
 
 void ossimPlanetServerThread::removeMessageHandler(osg::ref_ptr<ossimPlanetServerMessageHandler> messageHandler)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageHandlerMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageHandlerMutex);
    int idx = findMessageHandler(messageHandler.get());
    if(idx >= 0)
    {
@@ -290,7 +290,7 @@ void ossimPlanetServerThread::removeMessageHandler(osg::ref_ptr<ossimPlanetServe
 
 ossim_uint32 ossimPlanetServerThread::getNumberOfMessageHandlers()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageHandlerMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageHandlerMutex);
    return theMessageHandlerList.size();
 }
 

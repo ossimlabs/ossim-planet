@@ -121,7 +121,7 @@ double ossimPlanetNavigator::metersToCenter() const
 
 void ossimPlanetNavigator::update()
 {
-    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+    std::lock_guard<std::recursive_mutex> lock(theMutex);
    osg::ref_ptr<ossimPlanetGeoRefModel> model = landModel();
    if(!model.valid()) return;
     // cache initial values, we need them at the end to update idol
@@ -1147,7 +1147,7 @@ void ossimPlanetNavigator::destinationCommandExecute(const ossimPlanetDestinatio
 
 void ossimPlanetNavigator::execute(const ossimPlanetAction &action)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    const ossimPlanetDestinationCommandAction* a = action.toDestinationCommandAction();
    const ossimPlanetXmlAction* xml = action.toXmlAction();
    // for now only support :destination command <args> style actions;

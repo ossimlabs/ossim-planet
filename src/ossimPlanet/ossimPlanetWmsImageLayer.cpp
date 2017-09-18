@@ -214,7 +214,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetWmsImageLayer::getTexture(ossim_uint32
    {
       updateExtents();
    }
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theWmsArchiveMutex);
+   std::lock_guard<std::recursive_mutex> lock(theWmsArchiveMutex);
    if(theServer == "")
    {
       return 0;
@@ -321,7 +321,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetWmsImageLayer::getTexture(ossim_uint32
    {
       updateExtents();
    }
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theWmsArchiveMutex);
+   std::lock_guard<std::recursive_mutex> lock(theWmsArchiveMutex);
    osg::ref_ptr<ossimPlanetImage> image = 0;
 
    if(theServer == "")

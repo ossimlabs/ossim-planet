@@ -1,10 +1,9 @@
 #include <ossimPlanet/ossimPlanetPagedLandLod.h>
 #include <ossimPlanet/ossimPlanetLand.h>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 #include <osg/Geode>
 //#include <ossimPlanet/ossimPlanetDatabasePager.h>
 #include <osgUtil/CullVisitor>
+#include <mutex>
 
 //#define OSGPLANET_ENABLE_ALLOCATION_COUNT
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
@@ -122,15 +121,15 @@ public:
          if(n)
          {
            // ossimPlanetDatabasePager* pager = dynamic_cast<ossimPlanetDatabasePager*>(nv->getDatabaseRequestHandler());
-            //OpenThreads::ScopedLock<OpenThreads::Mutex> lock(n->theMutex);
+            //std::lock_guard<std::mutex> lock(n->theMutex);
             if(n->theRefreshType == ossimPlanetLandRefreshType_TEXTURE)
             {
-               OpenThreads::ScopedLock<OpenThreads::Mutex> lock(n->thePagedLodListMutex);
+               std::lock_guard<std::recursive_mutex> lock(n->thePagedLodListMutex);
                n->thePagedLodList.clear();
             }
             if(n->getNumChildren() > 0)
             {
-               OpenThreads::ScopedLock<OpenThreads::Mutex> lock(n->theTextureRequestMutex);
+               std::lock_guard<std::recursive_mutex> lock(n->theTextureRequestMutex);
                ossimPlanetPagedLandLodTextureVisitor visitor(n->theTextureRequest, n);
                if(n->theTextureRequest.valid())
                {
@@ -188,7 +187,7 @@ public:
                n->areAllChildrenCulled()||
                (n->theRefreshType == ossimPlanetLandRefreshType_PRUNE))
             {
-               OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(n->thePagedLodListMutex);
+               std::lock_guard<std::recursive_mutex> lock2(n->thePagedLodListMutex);
                ossim_uint32 idx = 0;
                if(numChildren > 1)
                {
@@ -225,7 +224,7 @@ public:
                }
                return;
             }
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(n->thePagedLodListMutex);
+            std::lock_guard<std::recursive_mutex> lock2(n->thePagedLodListMutex);
             if(n->thePagedLodList.size()==4)
             {
                if(n->getNumChildren() == 1) 
@@ -362,7 +361,7 @@ bool ossimPlanetPagedLandLod::areAllChildrenCulled(bool applyToAddedChildrenOnly
 
 bool ossimPlanetPagedLandLod::addChild( Node *child )
 {
-//   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+//   std::lock_guard<std::mutex> lock(theMutex);
    if(!child) return false;
 	
    ossimPlanetPagedLandLod* lod = dynamic_cast<ossimPlanetPagedLandLod*>(child);
@@ -370,7 +369,7 @@ bool ossimPlanetPagedLandLod::addChild( Node *child )
    bool result = false;
    if(lod)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePagedLodListMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePagedLodListMutex);
       if(getNumChildren() >4)
       {
          return false;
@@ -391,7 +390,7 @@ bool ossimPlanetPagedLandLod::addChild( Node *child )
       
       ossim_uint32 idx = thePagedLodList.size();
       thePagedLodList.push_back(lod);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lockChildList(theChildCullNodeListMutex);
+      std::lock_guard<std::recursive_mutex> lockChildList(theChildCullNodeListMutex);
       theChildCullNodeList[idx] = new ossimPlanetPagedLandLodCullNode(*lod->theCullNode);
       ossimPlanetLand* land = landLayer();
       if(land)
@@ -406,7 +405,7 @@ bool ossimPlanetPagedLandLod::addChild( Node *child )
          (request->getRow()   == theRow)&&
          (request->getCol()   == theCol))
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTextureRequestMutex);
+         std::lock_guard<std::recursive_mutex> lock(theTextureRequestMutex);
          theTextureRequest = request;
          ossimPlanetLand* land = landLayer();
          if(land)

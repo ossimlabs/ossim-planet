@@ -2,12 +2,11 @@
 #include <ossimPlanet/ossimPlanetTerrain.h>
 #include <ossimPlanet/ossimPlanetImage.h>
 #include <ossimPlanet/ossimPlanetVisitors.h>
-#include <OpenThreads/ScopedLock>
 #include <osg/io_utils>
-
+#include <mutex>
 //#define OSGPLANET_ENABLE_ALLOCATION_COUNT
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-static OpenThreads::Mutex objectCountMutex;
+static std::mutex objectCountMutex;
 static ossim_uint32 terrainTileCount = 0;
 #endif
 ossimPlanetTerrainTile::ossimPlanetTerrainTile()
@@ -25,7 +24,7 @@ theSimTimeStamp(0.0)
    setThreadSafeRefUnref(true);
    setUpdateCallback(new ossimPlanetTraverseCallback);
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(objectCountMutex);
+   std::lock_guard<std::mutex> lock(objectCountMutex);
    ++terrainTileCount;
    std::cout << "ossimPlanetTerrainTile count = " << terrainTileCount << std::endl;
 #endif
@@ -49,7 +48,7 @@ theSimTimeStamp(0.0)
    setThreadSafeRefUnref(true);
    //setCullingActive(false); // we will do our own culling
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(objectCountMutex);
+   std::lock_guard<std::mutex> lock(objectCountMutex);
    ++terrainTileCount;
    std::cout << "ossimPlanetTerrainTile count = " << terrainTileCount << std::endl;
 #endif
@@ -72,7 +71,7 @@ ossimPlanetTerrainTile::~ossimPlanetTerrainTile()
    theTextureRequest   = 0;
    theElevationRequest = 0;
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(objectCountMutex);
+   std::lock_guard<std::mutex> lock(objectCountMutex);
    --terrainTileCount;
    std::cout << "ossimPlanetTerrainTile count = " << terrainTileCount << std::endl;
 #endif
@@ -103,7 +102,7 @@ void ossimPlanetTerrainTile::traverse(osg::NodeVisitor& nv)
 }
 void ossimPlanetTerrainTile::setTerrainTechnique(ossimPlanetTerrainTechnique* terrainTechnique)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theTerrainTechnique = terrainTechnique;
    if(theTerrainTechnique.valid())
    {
@@ -121,13 +120,13 @@ void ossimPlanetTerrainTile::copyCommonParameters(ossimPlanetTerrainTile* src)
 
 void ossimPlanetTerrainTile::setTileId(const ossimPlanetTerrainTileId& value)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theId = value;
 }
 
 void ossimPlanetTerrainTile::setTerrain(ossimPlanetTerrain* value)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(theTerrain)
    {
       theTerrain->unregisterTile(this);
@@ -147,19 +146,19 @@ void ossimPlanetTerrainTile::setTerrain(ossimPlanetTerrain* value)
 
 ossimPlanetTerrain* ossimPlanetTerrainTile::terrain()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theTerrain;
 }
 
 const ossimPlanetTerrain* ossimPlanetTerrainTile::terrain()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theTerrain;
 }
 
 void ossimPlanetTerrainTile::resetImageLayers()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    ossim_uint32 idx;
   if(numberOfImageLayers()!= theTerrain->numberOfTextureLayers())
   {
@@ -188,7 +187,7 @@ void ossimPlanetTerrainTile::resetElevationLayer()
 void ossimPlanetTerrainTile::setNumberOfImageLayers(ossim_uint32 n)
 {
 
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
 
    if(n==0)
    {
@@ -202,13 +201,13 @@ void ossimPlanetTerrainTile::setNumberOfImageLayers(ossim_uint32 n)
 
 ossim_uint32 ossimPlanetTerrainTile::numberOfImageLayers()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return (ossim_uint32)theImageLayers.size();
 }
 
 bool ossimPlanetTerrainTile::imageLayersDirty()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; idx < theImageLayers.size();++idx)
    {
@@ -226,7 +225,7 @@ bool ossimPlanetTerrainTile::imageLayersDirty()const
 
 ossimPlanetTerrainImageLayer* ossimPlanetTerrainTile::imageLayer(ossim_uint32 idx)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    
    ossimPlanetTerrainImageLayer* result = 0;
    if(idx <theImageLayers.size())
@@ -239,7 +238,7 @@ ossimPlanetTerrainImageLayer* ossimPlanetTerrainTile::imageLayer(ossim_uint32 id
 
 ossimPlanetTerrainImageLayer* ossimPlanetTerrainTile::elevationLayer()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theElevationLayer.get();
 }
 
@@ -290,21 +289,21 @@ bool ossimPlanetTerrainTile::hasActiveOperations()const
 
 ossimPlanetTerrainTile* ossimPlanetTerrainTile::parentTile()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(getNumParents() < 1) return 0;
    return dynamic_cast<ossimPlanetTerrainTile*>(getParent(0));
 }
 
 const ossimPlanetTerrainTile* ossimPlanetTerrainTile::parentTile()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(getNumParents() < 1) return 0;
    return dynamic_cast<const ossimPlanetTerrainTile*>(getParent(0));
 }
 
 void ossimPlanetTerrainTile::vacantChildIds(ossimPlanetTerrainTechnique::TileIdList& ids)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(theTerrainTechnique.valid())
    {
       theTerrainTechnique->vacantChildIds(ids);
@@ -313,7 +312,7 @@ void ossimPlanetTerrainTile::vacantChildIds(ossimPlanetTerrainTechnique::TileIdL
 
 void ossimPlanetTerrainTile::merge()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(theTerrainTechnique.valid())
    {
       theTerrainTechnique->merge();
@@ -332,13 +331,13 @@ osg::BoundingSphere ossimPlanetTerrainTile::computeBound() const
 
 void ossimPlanetTerrainTile::setCulledFlag(bool culled)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theCulledFlag = culled;
 }
 
 bool ossimPlanetTerrainTile::culledFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theCulledFlag;
 }
 void ossimPlanetTerrainTile::releaseGLObjects(osg::State* state)

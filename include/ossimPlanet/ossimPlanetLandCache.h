@@ -40,7 +40,7 @@ public:
    void clearTextures();
    ossimPlanetImage* getTexture(ossim_uint32 idx)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::recursive_mutex> lock(theMutex);
       if(idx < theTextureList.size())
       {
          return theTextureList[idx].get();
@@ -50,7 +50,7 @@ public:
    }
    ossimPlanetImage* getElevation()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::recursive_mutex> lock(theMutex);
       return theElevation.get();
    }
    ossim_uint32 getTextureListSize()const
@@ -70,7 +70,7 @@ protected:
     */ 
    void adjustSize();
    mutable osg::Timer_t                          theTimeStamp;
-   ossimPlanetReentrantMutex                            theMutex;
+   std::recursive_mutex                          theMutex;
    ossimPlanetLandCache*                         theLandCache;
    ossim_uint64                                  theId;
    ossim_uint32                                  theNodeSizeInBytes;
@@ -104,7 +104,7 @@ protected:
     */ 
    void protectedShrinkCache();
    
-   ossimPlanetReentrantMutex       theMutex; 
+   std::recursive_mutex     theMutex; 
    ossim_uint64             theMaxCacheSize;
    ossim_uint64             theMinCacheSize; // used in shrinking the cache if exceeds the max
    ossim_uint64             theCurrentCacheSize;

@@ -1,7 +1,7 @@
 #include <ossimPlanet/ossimPlanetElevationRegistry.h>
 #include <ossimPlanet/ossimPlanetElevationFactory.h>
-#include <OpenThreads/ScopedLock>
 #include <algorithm>
+#include <mutex>
 
 ossimPlanetElevationRegistry::ossimPlanetElevationRegistry()
 {
@@ -9,7 +9,7 @@ ossimPlanetElevationRegistry::ossimPlanetElevationRegistry()
 
 bool ossimPlanetElevationRegistry::registerFactory(FactoryBase* factory)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    bool result = false;
    FactoryList::iterator iter = std::find(theFactoryList.begin(), theFactoryList.end(), factory);
    
@@ -24,7 +24,7 @@ bool ossimPlanetElevationRegistry::registerFactory(FactoryBase* factory)
 
 void ossimPlanetElevationRegistry::unregisterFactory(FactoryBase* factory)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    FactoryList::iterator iter = std::find(theFactoryList.begin(), theFactoryList.end(), factory);
    
    if(iter != theFactoryList.end())
@@ -35,7 +35,7 @@ void ossimPlanetElevationRegistry::unregisterFactory(FactoryBase* factory)
 
 ossimPlanetElevationDatabase* ossimPlanetElevationRegistry::openDatabase(const ossimString& location)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossimPlanetElevationDatabase* result = 0;
    
    FactoryList::iterator iter = theFactoryList.begin();

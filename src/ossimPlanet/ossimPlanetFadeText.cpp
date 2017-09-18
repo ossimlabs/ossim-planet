@@ -15,11 +15,10 @@
 #include <ossimPlanet/ossimPlanetFadeText.h>
 #include <osg/Notify>
 #include <osg/io_utils>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 #include <osgUtil/CullVisitor>
 #include <ossim/base/ossimCommon.h>
-
+#include <mutex>
+ 
 // using namespace osgText;
 
 // struct ossimPlanetFadeTextData : public osg::Referenced
@@ -152,7 +151,7 @@
     
 //     ossimPlanetFadeTextUserData* createNewFadeTextUserData(osg::View* view)
 //     {
-//         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_mutex);
+//         std::lock_guard<std::mutex> lock(_mutex);
         
 //         ossimPlanetFadeTextUserData* userData = new ossimPlanetFadeTextUserData;
 
@@ -264,7 +263,7 @@
 //     }
 
 //     unsigned int _frameNumber;
-//     OpenThreads::Mutex _mutex;
+//     std::mutex _mutex;
 //     ViewUserDataMap _viewMap;
 //     ViewFadeTextMap _viewFadeTextMap;
 // };

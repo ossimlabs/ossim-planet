@@ -7,8 +7,7 @@
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossimPlanet/ossimPlanetMessage.h>
 #include <vector>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetIo : public osg::Referenced
 {
@@ -66,27 +65,27 @@ public:
    }
    virtual void setConnectionHeader(osg::ref_ptr<ossimPlanetMessage> value)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
       theConnectionHeader = value;
    }
    void setFinishedFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
       theFinishedFlag = flag;
    }
    bool finishedFlag()const
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
          return theFinishedFlag;
       }
    const ossimString& name()const
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
          return theName;
       }
    void setName(const ossimString& name)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
          theName = name;
       }
    virtual void searchName(ossimString& searchNameResult)const
@@ -97,37 +96,37 @@ public:
       }
    char terminator()const
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
          return theTerminator;
       }
    void setTerminator(char terminator)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
          theTerminator = terminator;
       }
    virtual void setEnableFlag(bool flag)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
          theEnableFlag = flag;
       }
    bool enableFlag()const
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
          return theEnableFlag;
       }
    void setIoDirection(ossimPlanetIoDirection direction)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
       theIoDirection = direction;
    }
    ossimPlanetIoDirection ioDirection()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
       return theIoDirection;
    }
    virtual void pushConnectionHeader() 
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetIoPropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetIoPropertyMutex);
       if(theConnectionHeader.valid())
       {
          if(theConnectionHeader->dataSize() > 0)
@@ -146,9 +145,9 @@ private:
    bool                         theEnableFlag;
    ossimPlanetIoDirection       theIoDirection;
    osg::ref_ptr<ossimPlanetMessage>      theConnectionHeader;
-   mutable ossimPlanetReentrantMutex   thePlanetIoPropertyMutex;
+   mutable std::recursive_mutex   thePlanetIoPropertyMutex;
 protected:
-  mutable ossimPlanetReentrantMutex   theIoMutex;
+  mutable std::recursive_mutex   theIoMutex;
 
 };
 

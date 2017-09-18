@@ -4,7 +4,8 @@
 #include <osg/ref_ptr>
 #include "ossimPlanetExport.h"
 #include "ossimPlanetRefBlock.h"
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
+#include <mutex>
+
 class ossimPlanetThread;
 class OSSIMPLANET_DLL ossimPlanetThreadImp
 {
@@ -30,7 +31,7 @@ public:
    virtual bool doneFlag()const;
    virtual void updateThreadBlock();
 protected:
-   mutable ossimPlanetReentrantMutex theImpMutex;
+   mutable std::recursive_mutex theImpMutex;
    ossimPlanetThread* theThread;
    bool theDoneFlag;
 };

@@ -2,8 +2,8 @@
 
 #include <ossimPlanet/ossimPlanetTextureLayerRegistry.h>
 #include <ossimPlanet/ossimPlanetStandardTextureLayerFactory.h>
-#include <OpenThreads/ScopedLock>
 #include <iostream>
+#include <mutex>
 
 ossimPlanetTextureLayerRegistry* ossimPlanetTextureLayerRegistry::theInstance = 0;
 

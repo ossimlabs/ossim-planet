@@ -13,10 +13,9 @@
 #include <osg/MatrixTransform>
 #include <osg/Geode>
 #include <OpenThreads/Thread>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
-#include <OpenThreads/ScopedLock>
 #include <OpenThreads/Block>
 #include <osg/Switch>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetFFMpegImageStream :  public osg::ImageStream, public OpenThreads::Thread
 {
@@ -116,7 +115,7 @@ public:
    virtual float getVolume();
    void updateThreadBlock()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::recursive_mutex> lock(theMutex);
          
          // setting true will release the block
       theBlock->set((theVideo.valid())&&
@@ -142,8 +141,8 @@ public:
       updateThreadBlock();
    }
 protected:
-   ossimPlanetReentrantMutex                 theMutex;
-   osg::ref_ptr<ossimPlanetRefBlock> theBlock;
+   std::recursive_mutex               theMutex;
+   osg::ref_ptr<ossimPlanetRefBlock>  theBlock;
    ossimRefPtr<ossimPredatorVideo>    theVideo;
    ossim_float64                      theFrameRate;
    ossim_float64                      theSecondsToUpdate;
@@ -166,7 +165,7 @@ public:
       virtual void coordinatesChanged(ossimRefPtr<ossimPredatorKlvTable> /* originalTable */,
                                       osg::ref_ptr<ossimPlanetFFMpegImageStream::CoordinateInfo> transformedInfo)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theLayer->theCoordinateMutex);
+         std::lock_guard<std::recursive_mutex> lock(theLayer->theCoordinateMutex);
          theLayer->notifyPropertyChanged(theLayer, "coordinates");
          theLayer->theCoordinates = transformedInfo->dup();
          theLayer->setDescription(transformedInfo->theDescription);
@@ -235,7 +234,7 @@ protected:
     */
    osg::ref_ptr<osg::Texture2D>      theSharedTexture;
    osg::ref_ptr<ossimPlanetIconGeom> theIcon;
-   ossimPlanetReentrantMutex                thePredatorTraverseMutex;
+   mutable std::recursive_mutex      thePredatorTraverseMutex;
 
    
    /**
@@ -258,7 +257,7 @@ protected:
    osg::ref_ptr<ossimPlanetBillboardIcon> theBillboard;
    osg::ref_ptr<osg::MatrixTransform>     theBillboardMatrixTransform;
    osg::ref_ptr<ossimPlanetPredatorVideoLayerNode::ImageStreamCallback> theCallback;
-   ossimPlanetReentrantMutex                     theCoordinateMutex;
+   std::recursive_mutex                     theCoordinateMutex;
 };
 
 #endif

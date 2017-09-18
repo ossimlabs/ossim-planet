@@ -46,7 +46,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetElevationDatabaseGroup::getTexture(oss
    {
       updateExtents();
    }
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    ossimPlanetGrid::GridBound bound;
    ossimPlanetGrid::GridBound tileBound;
    bool withinExtents = true;
@@ -185,7 +185,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetElevationDatabaseGroup::getTexture(oss
    {
       updateExtents();
    }
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
 
    ossim_uint32 idx = 0;
    double minLat;
@@ -498,7 +498,7 @@ void ossimPlanetElevationDatabaseGroup::setPixelStatus(ossimPlanetImage* image)
 
 void ossimPlanetElevationDatabaseGroup::setGeoRefModel(osg::ref_ptr<ossimPlanetGeoRefModel> model)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    theGeoRefModel = model.get();
    ossim_uint32 bound = theChildrenList.size();
    ossim_uint32 idx = 0;

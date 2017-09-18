@@ -206,7 +206,7 @@ int ossimPlanetDatabasePager::cancel()
 
 void ossimPlanetDatabasePager::invalidateRequest(const std::string& requestString)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_fileRequestListMutex);
+   std::lock_guard<std::mutex> lock(_fileRequestListMutex);
    bool foundEntry = false;
    for(DatabaseRequestList::iterator ritr = _fileRequestList.begin();
        ritr != _fileRequestList.end() && !foundEntry;
@@ -223,7 +223,7 @@ void ossimPlanetDatabasePager::invalidateRequest(const std::string& requestStrin
 void ossimPlanetDatabasePager::removeRequest(osg::Group* group)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_fileRequestListMutex);
+      std::lock_guard<std::mutex> lock(_fileRequestListMutex);
       for(DatabaseRequestList::iterator ritr = _fileRequestList.begin();
           ritr != _fileRequestList.end();
           ++ritr)
@@ -236,7 +236,7 @@ void ossimPlanetDatabasePager::removeRequest(osg::Group* group)
       }
    }
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_dataToCompileListMutex);
+      std::lock_guard<std::mutex> lock(_dataToCompileListMutex);
       for(DatabaseRequestList::iterator ritr = _dataToCompileList.begin();
           ritr != _dataToCompileList.end();
           ++ritr)
@@ -249,7 +249,7 @@ void ossimPlanetDatabasePager::removeRequest(osg::Group* group)
       }
    }
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_dataToMergeListMutex);
+      std::lock_guard<std::mutex> lock(_dataToMergeListMutex);
       for(DatabaseRequestList::iterator ritr = _dataToMergeList.begin();
           ritr != _dataToMergeList.end();
           ++ritr)
@@ -262,10 +262,10 @@ void ossimPlanetDatabasePager::removeRequest(osg::Group* group)
       }
    }
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock1(_fileRequestListMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(_dataToCompileListMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock3(_dataToMergeListMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock4(_childrenToDeleteListMutex);
+      std::lock_guard<std::mutex> lock1(_fileRequestListMutex);
+      std::lock_guard<std::mutex> lock2(_dataToCompileListMutex);
+      std::lock_guard<std::mutex> lock3(_dataToMergeListMutex);
+      std::lock_guard<std::mutex> lock4(_childrenToDeleteListMutex);
       updateDatabasePagerThreadBlock();
       if(_dataToMergeList.empty()&&
          _dataToCompileList.empty()&&
@@ -281,10 +281,10 @@ void ossimPlanetDatabasePager::addToDeleteList(osg::Object* obj)
 {
    if (_deleteRemovedSubgraphsInDatabaseThread)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_childrenToDeleteListMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock1(_fileRequestListMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(_dataToCompileListMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock3(_dataToMergeListMutex);
+      std::lock_guard<std::mutex> lock(_childrenToDeleteListMutex);
+      std::lock_guard<std::mutex> lock1(_fileRequestListMutex);
+      std::lock_guard<std::mutex> lock2(_dataToCompileListMutex);
+      std::lock_guard<std::mutex> lock3(_dataToMergeListMutex);
       _childrenToDeleteList.push_back(obj);
       notifyDoingWork();
       updateDatabasePagerThreadBlock();
@@ -327,7 +327,7 @@ void ossimPlanetDatabasePager::run()
          {
             int deleteCount = 0;
             int deleteCountMax = 20;
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_childrenToDeleteListMutex);
+            std::lock_guard<std::mutex> lock(_childrenToDeleteListMutex);
             while (!_childrenToDeleteList.empty()&&(deleteCount < deleteCountMax))
             {
                //osg::notify(osg::NOTICE)<<"In DatabasePager thread deleting "<<_childrenToDeleteList.size()<<" objects"<<std::endl;
@@ -348,7 +348,7 @@ void ossimPlanetDatabasePager::run()
       
       // get the front of the file request list.
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_fileRequestListMutex);
+         std::lock_guard<std::mutex> lock(_fileRequestListMutex);
          if (!_fileRequestList.empty())
          {
             std::sort(_fileRequestList.begin(),_fileRequestList.end(),MySortFileRequestFunctor());
@@ -407,7 +407,7 @@ void ossimPlanetDatabasePager::run()
             // move the databaseRequest from the front of the fileRequest to the end of
             // dataToCompile or dataToMerge lists.
             {
-               OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_fileRequestListMutex);
+               std::lock_guard<std::mutex> lock(_fileRequestListMutex);
                
                DatabaseRequestList::iterator itr = std::find(_fileRequestList.begin(),_fileRequestList.end(),databaseRequest);
                if (itr != _fileRequestList.end()) 
@@ -416,13 +416,13 @@ void ossimPlanetDatabasePager::run()
                   {
                      if (loadedObjectsNeedToBeCompiled)
                      {
-                        OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_dataToCompileListMutex);
+                        std::lock_guard<std::mutex> lock(_dataToCompileListMutex);
 			_dataToCompileList.push_back(databaseRequest);
                         notifyUpdateSceneGraph();
                      }
                      else
                      {
-                        OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_dataToMergeListMutex);
+                        std::lock_guard<std::mutex> lock(_dataToMergeListMutex);
                         _dataToMergeList.push_back(databaseRequest);
 			notifyUpdateSceneGraph();
                      }
@@ -467,7 +467,7 @@ void ossimPlanetDatabasePager::run()
             //std::cout<<"frame number delta for "<<databaseRequest->_fileName<<" "<<_frameNumber-databaseRequest->_frameNumberLastRequest<<std::endl;
             // remove the databaseRequest from the front of the fileRequest to the end of
             // dataLoad list as its is no longer relevant
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_fileRequestListMutex);
+            std::lock_guard<std::mutex> lock(_fileRequestListMutex);
             
             if (!_fileRequestList.empty()) _fileRequestList.erase(_fileRequestList.begin());
             
@@ -499,10 +499,10 @@ void ossimPlanetDatabasePager::clearRequests()
 void ossimPlanetDatabasePager::updateSceneGraph(double currentFrameTime)
 {
    osgDB::DatabasePager::updateSceneGraph(currentFrameTime);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock1(_fileRequestListMutex);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(_dataToCompileListMutex);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock3(_dataToMergeListMutex);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock4(_childrenToDeleteListMutex);
+   std::lock_guard<std::mutex> lock1(_fileRequestListMutex);
+   std::lock_guard<std::mutex> lock2(_dataToCompileListMutex);
+   std::lock_guard<std::mutex> lock3(_dataToMergeListMutex);
+   std::lock_guard<std::mutex> lock4(_childrenToDeleteListMutex);
    if(_dataToMergeList.empty()&&
       _dataToCompileList.empty()&&
       _fileRequestList.empty()&&
@@ -515,10 +515,10 @@ void ossimPlanetDatabasePager::updateSceneGraph(double currentFrameTime)
 
 bool ossimPlanetDatabasePager::listsAreEmpty()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock1(_fileRequestListMutex);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(_dataToCompileListMutex);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock3(_dataToMergeListMutex);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock4(_childrenToDeleteListMutex);
+   std::lock_guard<std::mutex> lock1(_fileRequestListMutex);
+   std::lock_guard<std::mutex> lock2(_dataToCompileListMutex);
+   std::lock_guard<std::mutex> lock3(_dataToMergeListMutex);
+   std::lock_guard<std::mutex> lock4(_childrenToDeleteListMutex);
 
    return (_dataToMergeList.empty()&&
            _dataToCompileList.empty()&&
@@ -528,7 +528,7 @@ bool ossimPlanetDatabasePager::listsAreEmpty()const
 
 void ossimPlanetDatabasePager::addCallback(osg::ref_ptr<ossimPlanetDatabasePager::Callback> callback)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::mutex> lock(theCallbackListMutex);
    ossimPlanetDatabasePager::CallbackListType::iterator i = std::find(theCallbackList.begin(),
                                                              theCallbackList.end(),
                                                              callback);
@@ -540,7 +540,7 @@ void ossimPlanetDatabasePager::addCallback(osg::ref_ptr<ossimPlanetDatabasePager
 
 void ossimPlanetDatabasePager::removeCallback(osg::ref_ptr<ossimPlanetDatabasePager::Callback> callback)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::mutex> lock(theCallbackListMutex);
    ossimPlanetDatabasePager::CallbackListType::iterator i = std::find(theCallbackList.begin(),
                                                              theCallbackList.end(),
                                                              callback);
@@ -552,7 +552,7 @@ void ossimPlanetDatabasePager::removeCallback(osg::ref_ptr<ossimPlanetDatabasePa
 
 void ossimPlanetDatabasePager::notifyDoingWork()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::mutex> lock(theCallbackListMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; idx < theCallbackList.size(); ++idx)
    {
@@ -562,7 +562,7 @@ void ossimPlanetDatabasePager::notifyDoingWork()
 
 void ossimPlanetDatabasePager::notifyNoMoreWork()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::mutex> lock(theCallbackListMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; idx < theCallbackList.size(); ++idx)
    {
@@ -572,7 +572,7 @@ void ossimPlanetDatabasePager::notifyNoMoreWork()
 
 void ossimPlanetDatabasePager::notifyUpdateSceneGraph()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::mutex> lock(theCallbackListMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; idx < theCallbackList.size(); ++idx)
    {

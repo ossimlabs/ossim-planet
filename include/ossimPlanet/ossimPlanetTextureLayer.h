@@ -15,7 +15,6 @@
 #include <ossimPlanet/ossimPlanetCallback.h>
 #include <ossim/base/ossimXmlNode.h>
 #include <vector>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossimPlanet/ossimPlanetGrid.h>
 
 class ossimPlanetTextureLayerGroup;
@@ -218,7 +217,7 @@ public:
 /*    void addCallback(osg::ref_ptr<ossimPlanetTextureLayer::Callback> callback); */
 /*    void removeCallback(osg::ref_ptr<ossimPlanetTextureLayer::Callback> callback); */
 
-   OpenThreads::Mutex& mutex();
+   std::recursive_mutex& mutex();
    
    virtual void getMetadata(ossimRefPtr<ossimXmlNode> metadata)const;
    virtual ossimRefPtr<ossimXmlNode> saveXml(bool recurseFlag=true)const;
@@ -320,9 +319,9 @@ protected:
    bool                                   theTransparentColorFlag;
    TransparentColorType                   theTransparentColorVector; // [0] = r, [1] = g, [2] = b
    ossimString                            theFilterType;
-   mutable ossimPlanetReentrantMutex    thePropertyMutex;
-   mutable ossimPlanetReentrantMutex    theMutex;
-/*    mutable OpenThreads::Mutex             theCallbackMutex; */
+   mutable std::recursive_mutex    thePropertyMutex;
+   mutable std::recursive_mutex    theMutex;
+/*    mutable std::mutex             theCallbackMutex; */
    mutable bool                           theDirtyExtentsFlag;
    mutable bool                           theDirtyStatsFlag;
    mutable osg::ref_ptr<Stats>            theStats;

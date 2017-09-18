@@ -16,8 +16,6 @@
 #include <ossim/init/ossimInit.h>
 #include <osgUtil/SceneView>
 #include <osgViewer/Viewer>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 #include <ossimPlanet/ossimPlanetManipulator.h>
 #include <osgGA/TerrainManipulator>
 #include <osgGA/TerrainManipulator>
@@ -28,8 +26,9 @@
 #include <ossimPlanet/ossimPlanetXmlAction.h>
 #include <ossimPlanet/ossimPlanetViewer.h>
 #include <ossimPlanet/ossimPlanetShaderProgramSetup.h>
+#include <mutex>
 
-static OpenThreads::Mutex ossimPlanet_LayerListMutex;
+static std::mutex ossimPlanet_LayerListMutex;
 static ossim_uint64 ossimPlanet_initializationCount = 0;
 static ossimTrace traceDebug("ossimPlanetApi:debug");
 
@@ -897,7 +896,7 @@ OSSIMPLANET_DLL void ossimPlanet_removeLayerGivenPtr(ossimPlanet_StatePtr state,
 
 ossimPlanet_SizeType ossimPlanet_getNumberOfLayers(ossimPlanet_StatePtr state)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    if(state)
    {
       return static_cast<ossimPlanet_SizeType>(ossimPlanetStateBaseCast(state)->planet()->getNumChildren());
@@ -910,7 +909,7 @@ ossimPlanet_IndexType ossimPlanet_getIndexOfLayerGivenPtr(ossimPlanet_StatePtr s
                                                           ossimPlanet_LayerPtr layerPtr)
 {
    ossimPlanet_IndexType result = ossimPlanet_INVALID_INDEX;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    
    if(state&&layerPtr)
    {
@@ -936,7 +935,7 @@ ossimPlanet_LayerPtr ossimPlanet_getLayerGivenIndex(ossimPlanet_StatePtr state,
                                                     ossimPlanet_IndexType idx)
 {
    ossimPlanet_LayerPtr result = 0;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
   
    if(state&&(idx>=0))
    {
@@ -954,7 +953,7 @@ ossimPlanet_LayerPtr ossimPlanet_getLayerGivenIndex(ossimPlanet_StatePtr state,
 ossimPlanet_LayerPtr ossimPlanet_getLayerGivenId(ossimPlanet_StatePtr state,
                                                  ossimPlanet_ConstStringType id)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    ossimPlanet_LayerPtr result = 0;
    ossimString idString(id);
    
@@ -980,7 +979,7 @@ ossimPlanet_LayerPtr ossimPlanet_getLayerGivenId(ossimPlanet_StatePtr state,
 void ossimPlanet_setLayerId(ossimPlanet_LayerPtr layer,
                             ossimPlanet_ConstStringType id)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    if(layer)
    {
       ossimPlanetLayerCast(layer)->setId(ossimString(id));
@@ -990,7 +989,7 @@ void ossimPlanet_setLayerId(ossimPlanet_LayerPtr layer,
 void ossimPlanet_setLayerName(ossimPlanet_LayerPtr layer,
                               ossimPlanet_ConstStringType name)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    if(layer)
    {
       ossimPlanetLayerCast(layer)->setName(ossimString(name));
@@ -1000,7 +999,7 @@ void ossimPlanet_setLayerName(ossimPlanet_LayerPtr layer,
 void ossimPlanet_setLayerDescription(ossimPlanet_LayerPtr layer,
                                      ossimPlanet_ConstStringType description)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    if(layer)
    {
       ossimPlanetLayerCast(layer)->setDescription(ossimString(description));
@@ -1011,7 +1010,7 @@ void ossimPlanet_setLayerDescription(ossimPlanet_LayerPtr layer,
 void ossimPlanet_setLayerReceiverPathName(ossimPlanet_LayerPtr layer,
                                           ossimPlanet_ConstStringType receiverPathName)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    if(layer)
    {
       ossimString pathName = receiverPathName;
@@ -1025,7 +1024,7 @@ void ossimPlanet_setLayerReceiverPathName(ossimPlanet_LayerPtr layer,
 
 ossimPlanet_BOOL ossimPlanet_getLayerEnableFlag(ossimPlanet_LayerPtr layer)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    if(layer)
    {
      bool flag = ossimPlanetLayerCast(layer)->enableFlag();
@@ -1038,7 +1037,7 @@ ossimPlanet_BOOL ossimPlanet_getLayerEnableFlag(ossimPlanet_LayerPtr layer)
 void ossimPlanet_setLayerEnableFlag(ossimPlanet_LayerPtr layer, 
 												ossimPlanet_BOOL flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(ossimPlanet_LayerListMutex);
+   std::lock_guard<std::mutex> lock(ossimPlanet_LayerListMutex);
    if(layer)
    {
 		ossimPlanetLayerCast(layer)->setEnableFlag(flag==ossimPlanet_TRUE);

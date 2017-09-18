@@ -7,7 +7,7 @@
 #include <osg/Geometry>
 #include <osg/ClusterCullingCallback>
 #include <ossimPlanet/ossimPlanetBoundingBox.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
+#include <mutex>
 
 class ossimPlanetTerrainTile;
 class ossimPlanetTexture2D;
@@ -238,12 +238,12 @@ protected:
 //   unsigned int                        theCurrentReadOnlyBuffer;
 //   unsigned int                        theCurrentWriteBuffer;
    BufferData                            theBufferData;
-   ossimPlanetReentrantMutex theUpdateMutex;
+   std::recursive_mutex                  theUpdateMutex;
    
-   ossimPlanetReentrantMutex            theChildNodeCullParametersMutex;
+   std::recursive_mutex                 theChildNodeCullParametersMutex;
    std::vector<osg::ref_ptr<CullNode> > theChildNodeCullParameters;
    
-   OpenThreads::Mutex                   theInitMutex;
+   std::mutex                   theInitMutex;
    
    osg::Vec3d                           theAdjustedEye;
    osg::Vec3d                           thePriorityPoint;

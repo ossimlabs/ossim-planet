@@ -60,7 +60,7 @@ void ossimPlanetIoSocket::searchName(ossimString& searchNameResult)const
 
 ossim_uint32 ossimPlanetIoSocket::read(char* buffer, ossim_uint32 bufferSize, ossimPlanetIo::IoResultType& ioResult)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theIoMutex);
+   std::lock_guard<std::recursive_mutex> lock(theIoMutex);
    ossim_uint32 resultBytesRead = 0;
    if(handle() < 0)
    {
@@ -106,7 +106,7 @@ ossim_uint32 ossimPlanetIoSocket::read(char* buffer, ossim_uint32 bufferSize, os
 
 ossim_uint32 ossimPlanetIoSocket::write(const char* buffer, ossim_uint32 bufferSize, ossimPlanetIo::IoResultType& ioResult)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theIoMutex);
+   std::lock_guard<std::recursive_mutex> lock(theIoMutex);
    ossim_uint32 resultBytesWritten = 0;
    if(handle() < 0)
    {
@@ -154,7 +154,7 @@ bool ossimPlanetIoSocket::setSocket(const ossimString& host,
                                     int port,
                                     const ossimString& ioType)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theSocketMutex);
+   std::lock_guard<std::recursive_mutex> lock(theSocketMutex);
    return protectedSetSocket(host, port, ioType);
 }
 
@@ -242,7 +242,7 @@ void ossimPlanetIoSocket::performIo()
 {
    ossimPlanetIo::IoResultType ioResult;
    bool hasOutput = false;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theSocketMutex);
+   std::lock_guard<std::recursive_mutex> lock(theSocketMutex);
 
    if(theSocket->getHandle()<0)
    {
@@ -276,7 +276,7 @@ void ossimPlanetIoSocket::performIo()
    if(ioDirection()&ossimPlanetIoDirection_OUT&&enableFlag())
    {
       addToOutputBufferIfNeeded();
-      OpenThreads::ScopedLock<OpenThreads::Mutex> outBufferLock(theOutBufferMutex);
+      std::lock_guard<std::recursive_mutex> outBufferLock(theOutBufferMutex);
       if(theOutBuffer.size())
       {
          hasOutput = true;
@@ -304,8 +304,8 @@ void ossimPlanetIoSocket::performIo()
    }
    else
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> outBufferLock(theOutBufferMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> outQueueLock(theOutQueueMutex);
+      std::lock_guard<std::recursive_mutex> outBufferLock(theOutBufferMutex);
+      std::lock_guard<std::recursive_mutex> outQueueLock(theOutQueueMutex);
       theOutBuffer.clear();
       theOutQueue.clear();
    }
@@ -407,7 +407,7 @@ void ossimPlanetIoSocket::performIo()
                   }
                   else // will have to do a custom parse later.
                   {
-                     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theInQueueMutex);
+                     std::lock_guard<std::recursive_mutex> lock(theInQueueMutex);
                      
                      theInQueue.push(new ossimPlanetMessage("",std::vector<char>(theInBuffer.begin(),
                                                                               theInBuffer.begin()+in.tellg())));
@@ -468,7 +468,7 @@ bool ossimPlanetIoSocket::pushMessage(osg::ref_ptr<ossimPlanetMessage> message, 
 {
    if(!(ioDirection()&ossimPlanetIoDirection_OUT) || !enableFlag()) return false; 
    bool result = true;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOutQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock(theOutQueueMutex);
    OutQueueType::iterator iter = theOutQueue.begin();
    if(!message->id().empty())
    {
@@ -489,7 +489,7 @@ bool ossimPlanetIoSocket::pushMessage(osg::ref_ptr<ossimPlanetMessage> message, 
 #if 0
    bool needTerminator = message[(size_t)0] == ':'; // check for old : action message format
    if(!enableFlag()) return false;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOutGoingMutex);
+   std::lock_guard<std::recursive_mutex> lock(theOutGoingMutex);
    if(forcePushFlag) // we will always support one message no matter the size
    {
       theOutBuffer.push_back(message);
@@ -601,14 +601,14 @@ bool ossimPlanetIoSocket::openIo()
 
 void ossimPlanetIoSocket::setMaxBytesToSendPerIo(ossim_uint32 byte)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMaxBytesToSendPerIoMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMaxBytesToSendPerIoMutex);
 
    theMaxBytesToSendPerIo = byte;
 }
 
 ossim_uint32 ossimPlanetIoSocket::maxBytesToSendPerIo()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMaxBytesToSendPerIoMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMaxBytesToSendPerIoMutex);
    return theMaxBytesToSendPerIo;
 }
 
@@ -635,8 +635,8 @@ bool ossimPlanetIoSocket::makeClientSocket()
 
 void ossimPlanetIoSocket::addToOutputBufferIfNeeded()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock1(theOutQueueMutex);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(theOutBufferMutex);
+   std::lock_guard<std::recursive_mutex> lock1(theOutQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock2(theOutBufferMutex);
  
    if(theOutBuffer.empty()&&(!theOutQueue.empty()))
    {

@@ -2,8 +2,7 @@
 #define ossimPlanetTextureLayerGroup_HEADER
 #include <ossimPlanet/ossimPlanetTextureLayer.h>
 #include <vector>
-#include <OpenThreads/ScopedLock>
-#include <OpenThreads/ReentrantMutex>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetTextureLayerGroup : public ossimPlanetTextureLayer
 {
@@ -101,7 +100,7 @@ protected:
    std::vector<osg::ref_ptr<ossimPlanetTextureLayer> > removeLayersNoMutex(ossim_uint32 idx, ossim_uint32 length=1, bool notifyFlag=true);
    ossim_int32 findLayerIndexNoMutex(osg::ref_ptr<ossimPlanetTextureLayer> layer)const;
    
-   mutable OpenThreads::Mutex theChildrenListMutex;
+   mutable std::mutex theChildrenListMutex;
    std::vector<osg::ref_ptr<ossimPlanetTextureLayer> > theChildrenList;
    osg::ref_ptr<ossimPlanetTextureLayerCallback>    theChildListener;
    

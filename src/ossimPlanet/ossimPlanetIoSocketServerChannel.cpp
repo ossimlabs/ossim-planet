@@ -40,7 +40,7 @@ bool ossimPlanetIoSocketServerChannel::setSocket(const std::string& host,
                                                  const std::string& ioType)
 {
    
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theSocketMutex);
+   std::lock_guard<std::recursive_mutex> lock(theSocketMutex);
    return protectedSetSocket(host, port, ioType);
 }
 
@@ -124,7 +124,7 @@ bool ossimPlanetIoSocketServerChannel::isTcp()const
 
 void ossimPlanetIoSocketServerChannel::performIo()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theSocketMutex);
+   std::lock_guard<std::recursive_mutex> lock(theSocketMutex);
    if(handle() < 0)
    {
       if(theAutoReconnectFlag)
@@ -170,7 +170,7 @@ void ossimPlanetIoSocketServerChannel::performIo()
    poll(10);
    
    // handle any current connections and process the messages.
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lockList(theIoListMutex);
+   std::lock_guard<std::recursive_mutex> lockList(theIoListMutex);
    std::vector<osg::ref_ptr<ossimPlanetIo> >::iterator iter = theIoList.begin();
    while(iter!=theIoList.end())
    {

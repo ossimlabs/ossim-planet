@@ -29,7 +29,7 @@ ossimPlanetClientConnection::~ossimPlanetClientConnection()
 
 ossimString ossimPlanetClientConnection::getHost()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossimString result;
    if(theSocket)
    {
@@ -41,7 +41,7 @@ ossimString ossimPlanetClientConnection::getHost()const
 
 ossimString ossimPlanetClientConnection::getPortString()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossimString result;
 
    if(theSocket)
@@ -54,7 +54,7 @@ ossimString ossimPlanetClientConnection::getPortString()const
 
 ossimString ossimPlanetClientConnection::getPortType()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossimString result;
 
    if(theSocket)
@@ -69,7 +69,7 @@ void ossimPlanetClientConnection::getConnection(ossimString& host,
                                                 ossimString& port,
                                                 ossimString& portType)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    
    if(theSocket)
    {
@@ -83,7 +83,7 @@ bool ossimPlanetClientConnection::setConnection(const ossimString& host,
                                                 const ossimString& port,
                                                 const ossimString& portType)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    bool result = false;
    
    if(theSocket)
@@ -97,7 +97,7 @@ bool ossimPlanetClientConnection::setConnection(const ossimString& host,
 
 void ossimPlanetClientConnection::addMessage(const ossimString& message)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageQueueMutex);
    if(theSocket)
    {
       theMessageQueue.push_back(message);
@@ -110,8 +110,8 @@ void ossimPlanetClientConnection::addMessage(const ossimString& message)
 
 void ossimPlanetClientConnection::sendNextMessage()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock1(theMessageQueueMutex);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(theMutex);
+   std::lock_guard<std::recursive_mutex> lock1(theMessageQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock2(theMutex);
 
    if(!theMessageQueue.empty()&&theSocket)
    {
@@ -122,14 +122,14 @@ void ossimPlanetClientConnection::sendNextMessage()
 
 bool ossimPlanetClientConnection::hasMessages()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageQueueMutex);
 
    return !theMessageQueue.empty();
 }
 
 void ossimPlanetClientConnection::clearQueue()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageQueueMutex);
    theMessageQueue.clear();
 }
 
@@ -153,7 +153,7 @@ SGSocket* ossimPlanetClientConnection::getSocket()
 
 void ossimPlanetClientConnection::setSocket(SGSocket* socket)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    if(theSocket != socket)
    {
       theSocket->close();
@@ -221,7 +221,7 @@ osg::ref_ptr<ossimPlanetClientConnection>  ossimPlanetClientThread::newConnectio
    SGSocket* socket = new SGSocket(host, port, portType);
    socket->open(SG_IO_OUT);
 
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    osg::ref_ptr<ossimPlanetClientConnection> connection = new ossimPlanetClientConnection(socket);
    theClientConnectionList.push_back(connection.get());
 
@@ -233,7 +233,7 @@ bool ossimPlanetClientThread::setConnection(ossim_uint32 idx,
                                             const ossimString& port,
                                             const ossimString& portType)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    if(idx < theClientConnectionList.size())
    {
       return theClientConnectionList[idx]->setConnection(host, port, portType);
@@ -244,7 +244,7 @@ bool ossimPlanetClientThread::setConnection(ossim_uint32 idx,
 
 void ossimPlanetClientThread::removeConnection(osg::ref_ptr<ossimPlanetClientConnection> connection)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    ossimPlanetClientThreadConnectionList::iterator iter = std::find(theClientConnectionList.begin(),
                                                                     theClientConnectionList.end(),
                                                                     connection.get());
@@ -257,7 +257,7 @@ void ossimPlanetClientThread::removeConnection(osg::ref_ptr<ossimPlanetClientCon
 osg::ref_ptr<ossimPlanetClientConnection> ossimPlanetClientThread::removeConnection(ossim_uint32 idx)
 {
    osg::ref_ptr<ossimPlanetClientConnection> result;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    if(idx < theClientConnectionList.size())
    {
       result = theClientConnectionList[idx];
@@ -271,7 +271,7 @@ osg::ref_ptr<ossimPlanetClientConnection> ossimPlanetClientThread::removeConnect
 const osg::ref_ptr<ossimPlanetClientConnection> ossimPlanetClientThread::getConnection(ossim_uint32 idx)const
 {
    osg::ref_ptr<ossimPlanetClientConnection> result;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    if(idx < theClientConnectionList.size())
    {
       result = theClientConnectionList[idx];
@@ -284,7 +284,7 @@ const osg::ref_ptr<ossimPlanetClientConnection> ossimPlanetClientThread::getConn
 void ossimPlanetClientThread::sendMessage(ossim_uint32 idx,
                                           const ossimString& message)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    protectedSendMessage(idx, message);
    
    if(theStartedFlag)
@@ -309,7 +309,7 @@ void ossimPlanetClientThread::protectedSendMessage(ossim_uint32 idx,
 
 void ossimPlanetClientThread::broadcastMessage(const ossimString& message)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    ossim_uint32 idx;
    for(idx = 0; idx < theClientConnectionList.size();++idx)
    {
@@ -328,13 +328,13 @@ void ossimPlanetClientThread::broadcastMessage(const ossimString& message)
 
 ossim_uint32 ossimPlanetClientThread::getNumberOfConnections()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    return theClientConnectionList.size();
 }
 
 void ossimPlanetClientThread::updateClientThreadBlock()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theConnectionListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theConnectionListMutex);
    protectedUpdateClientThreadBlock();
 }
 

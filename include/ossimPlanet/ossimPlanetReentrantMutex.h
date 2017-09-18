@@ -1,14 +1,13 @@
 #ifndef ossimPlanetReentrantMutex_HEADER
 #define ossimPlanetReentrantMutex_HEADER
 #include <OpenThreads/Thread>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 
 /**
  * This is out of SVN for the nex 2.8.1 release of OSG.  There was a bug in the lock and unlock
  * I will use this until the new 2.8.1 comes out.
  */
-class ossimPlanetReentrantMutex : public OpenThreads::Mutex
+class ossimPlanetReentrantMutex : public std::mutex
 {
 public:
    
@@ -21,7 +20,7 @@ public:
    virtual int lock()
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_lockCountMutex);
+         std::lock_guard<std::mutex> lock(_lockCountMutex);
          if (_threadHoldingMutex==OpenThreads::Thread::CurrentThread() && _lockCount>0)
          {
             ++_lockCount;
@@ -32,7 +31,7 @@ public:
       int result = Mutex::lock();
       if (result==0)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_lockCountMutex);
+         std::lock_guard<std::mutex> lock(_lockCountMutex);
          
          _threadHoldingMutex = OpenThreads::Thread::CurrentThread();
          _lockCount = 1;
@@ -43,7 +42,7 @@ public:
    
    virtual int unlock()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_lockCountMutex);
+      std::lock_guard<std::mutex> lock(_lockCountMutex);
 #if 0
       if (_threadHoldingMutex==OpenThreads::Thread::CurrentThread() && _lockCount>0)
       {
@@ -76,7 +75,7 @@ public:
    virtual int trylock()
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_lockCountMutex);
+         std::lock_guard<std::mutex> lock(_lockCountMutex);
          if (_threadHoldingMutex==OpenThreads::Thread::CurrentThread() && _lockCount>0)
          {
             ++_lockCount;
@@ -87,7 +86,7 @@ public:
       int result = Mutex::trylock();
       if (result==0)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_lockCountMutex);
+         std::lock_guard<std::mutex> lock(_lockCountMutex);
          
          _threadHoldingMutex = OpenThreads::Thread::CurrentThread();
          _lockCount = 1;
@@ -97,13 +96,13 @@ public:
    
 private:
    
-   ossimPlanetReentrantMutex(const ossimPlanetReentrantMutex&):OpenThreads::Mutex() {}
+   ossimPlanetReentrantMutex(const ossimPlanetReentrantMutex&):std::mutex() {}
    
    ossimPlanetReentrantMutex& operator =(const ossimPlanetReentrantMutex&) { return *(this); }
    
    OpenThreads::Thread* _threadHoldingMutex;
    
-   OpenThreads::Mutex  _lockCountMutex;
+   std::mutex  _lockCountMutex;
    unsigned int        _lockCount;
    
 };
