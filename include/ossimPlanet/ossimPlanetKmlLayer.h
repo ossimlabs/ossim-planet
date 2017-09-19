@@ -4,7 +4,6 @@
 #include <ossimPlanet/ossimPlanetGeoRefModel.h>
 #include <ossimPlanet/ossimPlanetKmlLayerNode.h>
 #include <ossimPlanet/ossimPlanetKml.h>
-#include <OpenThreads/Mutex>
 #include <osgDB/ReaderWriter>
 #include <osg/Texture2D>
 #include <osg/FrameStamp>
@@ -16,6 +15,7 @@
 #include <ossimPlanet/ossimPlanetDatabasePager.h>
 #include <ossimPlanet/ossimPlanetActionReceiver.h>
 #include <ossimPlanet/ossimPlanetOperation.h>
+#include <mutex>
 
 class ossimPlanet;
 class OSSIMPLANET_DLL ossimPlanetKmlLayerReaderWriter : public osgDB::ReaderWriter
@@ -176,9 +176,9 @@ protected:
    };
    bool hasCallback(const ossimPlanetKmlLayerCallback* callback)const;
    void initializePalettes();
-   mutable ossimPlanetReentrantMutex theGraphMutex;                                           
-   mutable ossimPlanetReentrantMutex theReadyToAddListMutex;                                           
-   mutable ossimPlanetReentrantMutex theReadyToProcessKmlListMutex;
+   mutable std::recursive_mutex theGraphMutex;                                           
+   mutable std::recursive_mutex theReadyToAddListMutex;                                           
+   mutable std::recursive_mutex theReadyToProcessKmlListMutex;
    std::vector<osg::ref_ptr<ossimPlanetKmlLayerNode> > theNodeList;
 
 
@@ -193,7 +193,7 @@ protected:
    osg::ref_ptr<ossimPlanetOperationThreadQueue> theOperationQueue;
 //   osg::ref_ptr<ossimPlanetKmlLayer::PagerCallback> thePagerCallback; 
    
-   OpenThreads::Mutex theNodesToAddListMutex;
+   std::mutex theNodesToAddListMutex;
    std::vector<NodeToAddInfo> theNodesToAddList;
    osg::ref_ptr<osg::Referenced> theRequestRef;
 };

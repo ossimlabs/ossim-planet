@@ -1,8 +1,9 @@
 #ifndef ossimPlanetIdManager_HEADER
 #define ossimPlanetIdManager_HEADER
 #include "ossimPlanetId.h"
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include "ossimPlanetExport.h"
+#include <mutex>
+
 class OSSIMPLANET_DLL ossimPlanetIdManager
 {
 public:
@@ -10,6 +11,6 @@ public:
    
 protected:
    static ossimPlanetId theCurrentId;
-   static ossimPlanetReentrantMutex theMutex;
+   static std::recursive_mutex theMutex;
 };
 #endif

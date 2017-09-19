@@ -72,7 +72,7 @@ void ossimPlanetTextureLayer::dirtyExtents()
 {
    // already dirty
    if(theDirtyExtentsFlag) return;
-//    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theParentListMutex);
+//    std::lock_guard<std::mutex> lock(theParentListMutex);
    theDirtyExtentsFlag = true;
    ossim_uint32 idx = 0;
    for(idx = 0; idx < theParentList.size(); ++idx)
@@ -88,7 +88,7 @@ void ossimPlanetTextureLayer::setDirtyExtentsFlag(bool flag)
 
 void ossimPlanetTextureLayer::dirtyStats()
 {
-//    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theParentListMutex);
+//    std::lock_guard<std::mutex> lock(theParentListMutex);
    theDirtyStatsFlag = true;
 
    ossim_uint32 idx = 0;
@@ -100,7 +100,7 @@ void ossimPlanetTextureLayer::dirtyStats()
 
 void ossimPlanetTextureLayer::addBytesTransferredStat(ossim_uint64 bytesTransferred)const
 {
-//    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theParentListMutex);
+//    std::lock_guard<std::mutex> lock(theParentListMutex);
    theStats->setBytesTransferred(theStats->bytesTransferred() + bytesTransferred);
    ossim_uint32 idx = 0;
    for(idx = 0; idx < theParentList.size(); ++idx)
@@ -238,7 +238,7 @@ const ossimPlanetTextureLayerGroup* ossimPlanetTextureLayer::getParent(ossim_uin
 
 ossimPlanetTextureLayerGroup* ossimPlanetTextureLayer::parent(ossim_uint32 idx)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
 
    if(idx < theParentList.size())
    {
@@ -250,7 +250,7 @@ ossimPlanetTextureLayerGroup* ossimPlanetTextureLayer::parent(ossim_uint32 idx)
 
 const ossimPlanetTextureLayerGroup* ossimPlanetTextureLayer::parent(ossim_uint32 idx)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
 
    if(idx < theParentList.size())
    {
@@ -262,7 +262,7 @@ const ossimPlanetTextureLayerGroup* ossimPlanetTextureLayer::parent(ossim_uint32
 
 bool ossimPlanetTextureLayer::hasParent(ossimPlanetTextureLayerGroup* parent)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossim_uint32 idx = 0;
 
    for(idx = 0; idx < theParentList.size(); ++idx)
@@ -278,7 +278,7 @@ bool ossimPlanetTextureLayer::hasParent(ossimPlanetTextureLayerGroup* parent)con
 
 void ossimPlanetTextureLayer::addParent(ossimPlanetTextureLayerGroup* parent)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossim_uint32 idx = 0;
 
    for(idx = 0; idx < theParentList.size(); ++idx)
@@ -294,7 +294,7 @@ void ossimPlanetTextureLayer::addParent(ossimPlanetTextureLayerGroup* parent)
 
 void ossimPlanetTextureLayer::removeParent(ossimPlanetTextureLayerGroup* parent)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossim_uint32 idx = 0;
 
    for(idx = 0; idx < theParentList.size(); ++idx)
@@ -322,14 +322,14 @@ void ossimPlanetTextureLayer::detachFromParents()
 
 const ossimString& ossimPlanetTextureLayer::id()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theId;
 }
 
 void ossimPlanetTextureLayer::setId(const ossimString& id)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theId = id;
    }
    notifyPropertyChanged("id", this);
@@ -338,7 +338,7 @@ void ossimPlanetTextureLayer::setId(const ossimString& id)
 void ossimPlanetTextureLayer::setEnableFlag(bool flag)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theEnableFlag = flag;  
    }
    notifyPropertyChanged("enableFlag", this);
@@ -346,20 +346,20 @@ void ossimPlanetTextureLayer::setEnableFlag(bool flag)
 
 bool ossimPlanetTextureLayer::getEnableFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theEnableFlag;
 }
 
 bool ossimPlanetTextureLayer::enableFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theEnableFlag;
 }
 
 void ossimPlanetTextureLayer::setName(const ossimString& name)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theName = name;
    }
    notifyPropertyChanged("name", this);
@@ -367,20 +367,20 @@ void ossimPlanetTextureLayer::setName(const ossimString& name)
 
 const ossimString& ossimPlanetTextureLayer::getName()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theName;
 }
 
 const ossimString& ossimPlanetTextureLayer::name()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theName;
 }
 
 void ossimPlanetTextureLayer::setDescription(const ossimString& description)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theDescription = description;
    }
    notifyPropertyChanged("description", this);
@@ -388,31 +388,31 @@ void ossimPlanetTextureLayer::setDescription(const ossimString& description)
 
 const ossimString& ossimPlanetTextureLayer::getDescription()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theDescription;
 }
 
 const ossimString& ossimPlanetTextureLayer::description()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theDescription;
 }
 
 bool ossimPlanetTextureLayer::getTransparentColorFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theTransparentColorFlag;
 }
 
 void ossimPlanetTextureLayer::setTransparentColorFlag(bool flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theTransparentColorFlag = flag;
 }
 
 const ossimPlanetTextureLayer::TransparentColorType& ossimPlanetTextureLayer::getTransparentColor()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theTransparentColorVector;
 }
 
@@ -420,7 +420,7 @@ void ossimPlanetTextureLayer::setTransparentColor(unsigned int r,
                                                   unsigned int g,
                                                   unsigned int b)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theTransparentColorVector[0] = r;
    theTransparentColorVector[1] = g;
    theTransparentColorVector[2] = b;
@@ -731,7 +731,7 @@ const ossimString& ossimPlanetTextureLayer::getFilterTypeAsString()const
 
 // void ossimPlanetTextureLayer::addCallback(osg::ref_ptr<ossimPlanetTextureLayer::Callback> callback)
 // {
-//    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackMutex);
+//    std::lock_guard<std::mutex> lock(theCallbackMutex);
    
 //    ossimPlanetTextureLayer::CallbackList::iterator iter = std::find(theCallbackList.begin(), theCallbackList.end(), callback);
 //    if(iter == theCallbackList.end())
@@ -742,7 +742,7 @@ const ossimString& ossimPlanetTextureLayer::getFilterTypeAsString()const
 
 // void ossimPlanetTextureLayer::removeCallback(osg::ref_ptr<ossimPlanetTextureLayer::Callback> callback)
 // {
-//    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackMutex);
+//    std::lock_guard<std::mutex> lock(theCallbackMutex);
 //    ossimPlanetTextureLayer::CallbackList::iterator iter = std::find(theCallbackList.begin(), theCallbackList.end(), callback);
 //    if(iter != theCallbackList.end())
 //    {
@@ -753,7 +753,7 @@ const ossimString& ossimPlanetTextureLayer::getFilterTypeAsString()const
 
 void ossimPlanetTextureLayer::notifyRefreshExtent(osg::ref_ptr<ossimPlanetExtents> extent)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -767,7 +767,7 @@ void ossimPlanetTextureLayer::notifyRefreshExtent(osg::ref_ptr<ossimPlanetExtent
 
 void ossimPlanetTextureLayer::notifyLayerAdded(osg::ref_ptr<ossimPlanetTextureLayer> layer)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -783,7 +783,7 @@ void ossimPlanetTextureLayer::notifyLayerAdded(osg::ref_ptr<ossimPlanetTextureLa
 void ossimPlanetTextureLayer::notifyLayerRemoved(osg::ref_ptr<ossimPlanetTextureLayer> layer,
                                                  osg::ref_ptr<ossimPlanetTextureLayer> parent)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -799,7 +799,7 @@ void ossimPlanetTextureLayer::notifyLayerRemoved(osg::ref_ptr<ossimPlanetTexture
 void ossimPlanetTextureLayer::notifyPropertyChanged(const ossimString& name,
                                                     const ossimPlanetTextureLayer* layer)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -813,7 +813,7 @@ void ossimPlanetTextureLayer::notifyPropertyChanged(const ossimString& name,
 
 void ossimPlanetTextureLayer::resetLookAt()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    double lat, lon, len;
    getCenterLatLonLength(lat, lon, len);
 
@@ -1401,7 +1401,7 @@ void ossimPlanetTextureLayer::convertToOsg(ossimImageData* data,
    image->setPixelStatus();
 }
 
-OpenThreads::Mutex& ossimPlanetTextureLayer::mutex()
+std::recursive_mutex& ossimPlanetTextureLayer::mutex()
 {
    return theMutex;
 }
@@ -1569,19 +1569,19 @@ void ossimPlanetTextureLayer::remove()
 
 ossim_float32 ossimPlanetTextureLayer::brightness()const
 {
-  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+  std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
   return theBrightness;
 }
 
 ossim_float32 ossimPlanetTextureLayer::contrast()const
 {
-  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+  std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
   return theContrast;
 }
 
 ossim_float32 ossimPlanetTextureLayer::opacity()const
 {
-  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+  std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
   return theOpacity;
 }
 
@@ -1592,7 +1592,7 @@ void ossimPlanetTextureLayer::setBrightnessContrast(ossim_float32 brightnessValu
                                                     ossim_float32 contrastValue,
                                                     bool notifyFlag)
 {
-  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+  std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
   theBrightness = brightnessValue;
   theContrast   = contrastValue;
   if(notifyFlag)
@@ -1604,7 +1604,7 @@ void ossimPlanetTextureLayer::setBrightnessContrast(ossim_float32 brightnessValu
 void ossimPlanetTextureLayer::setBrightness(ossim_float32 brightnessValue,
                                             bool notifyFlag)
 {
-  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+  std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
   theBrightness = brightnessValue;
   if(notifyFlag)
   {
@@ -1615,7 +1615,7 @@ void ossimPlanetTextureLayer::setBrightness(ossim_float32 brightnessValue,
 void ossimPlanetTextureLayer::setContrast(ossim_float32 contrastValue,
                                           bool notifyFlag)
 {
-  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+  std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
   theContrast   = contrastValue;
   if(notifyFlag)
   {
@@ -1631,7 +1631,7 @@ void ossimPlanetTextureLayer::setContrast(ossim_float32 contrastValue,
 void ossimPlanetTextureLayer::setOpacity(ossim_float32 opacityValue,
                                          bool notifyFlag)
 {
-  OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+  std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
   theOpacity = opacityValue;
 
   if(notifyFlag)

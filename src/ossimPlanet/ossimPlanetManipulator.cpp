@@ -13,10 +13,9 @@
 #include <ossim/base/ossimEnvironmentUtility.h>
 #include <ossimPlanet/ossimPlanetActionRouter.h>
 #include <osg/CoordinateSystemNode>
-#include <OpenThreads/ScopedLock>
 #include <ossimPlanet/ossimPlanetDestinationCommandAction.h>
 #include <osg/io_utils>
-
+#include <mutex>
 
 #include <iostream>
 
@@ -247,7 +246,7 @@ osg::Node* ossimPlanetManipulator::getNode()
 void ossimPlanetManipulator::getLatLonHgtHPR(double& lat, double& lon, double& hgt,
                                              double& heading, double& pitch, double& roll)const
 {
-//    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+//    std::lock_guard<std::mutex> lock(theMutex);
    lat     = theNavigator->lat();
    lon     = theNavigator->lon();
    hgt     = theNavigator->elev();
@@ -337,7 +336,7 @@ bool ossimPlanetManipulator::handle(const GUIEventAdapter& ea,GUIActionAdapter& 
    {
       return false;
    }
-//    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+//    std::lock_guard<std::mutex> lock(theMutex);
    ossimPlanetInteractionController* iac = ossimPlanetInteractionController::instance();
 
    ossimString modKeyString;
@@ -690,7 +689,7 @@ bool ossimPlanetManipulator::calculateLineOfSiteLatLonHeight(osg::Vec3d& latLonH
 
 void ossimPlanetManipulator::setByMatrix(const osg::Matrixd& matrix)
 {
-//     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+//     std::lock_guard<std::mutex> lock(theMutex);
     osg::Matrixd m;
     m.invert(matrix);
     if (!theNavigator->landModel().valid())
@@ -732,7 +731,7 @@ osg::Vec3d ossimPlanetManipulator::eyePosition()const
    {
       osg::Vec3d(0,0,0)*theViewMatrixBuilder->viewMatrix();
    }
-//    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+//    std::lock_guard<std::mutex> lock(theMutex);
    return osg::Vec3d(0,0,0)*theNavigator->viewMatrix();
 }
 

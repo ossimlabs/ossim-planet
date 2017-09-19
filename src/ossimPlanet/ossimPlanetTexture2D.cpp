@@ -1,21 +1,20 @@
 #include <iostream>
 #include <ossimPlanet/ossimPlanetTexture2D.h>
 #include <ossimPlanet/ossimPlanetImage.h>
-#include <OpenThreads/ScopedLock>
 #include <osg/DisplaySettings>
 //#define OSGPLANET_ENABLE_ALLOCATION_COUNT
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-static OpenThreads::Mutex objectCountMutex;
+static std::mutex objectCountMutex;
 static ossim_uint32 textureCount = 0;
 #endif
-
+#include <mutex>
 ossimPlanetTexture2D::ossimPlanetTexture2D(const ossimPlanetTerrainTileId& id)
 
    :osg::Texture2D(),
    theTileId(id)
 {
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(objectCountMutex);
+   std::lock_guard<std::mutex> lock(objectCountMutex);
    ++textureCount;
    std::cout << "ossimPlanetTexture2D count = " << textureCount << "\n";
 #endif
@@ -27,7 +26,7 @@ ossimPlanetTexture2D::ossimPlanetTexture2D(osg::Image* image,
    theTileId(id)
 {
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(objectCountMutex);
+   std::lock_guard<std::mutex> lock(objectCountMutex);
    ++textureCount;
    std::cout << "ossimPlanetTexture2D count = " << textureCount << "\n";
 #endif   
@@ -37,7 +36,7 @@ ossimPlanetTexture2D::ossimPlanetTexture2D(ossimPlanetImage* image)
 theTileId(image?image->tileId():ossimPlanetTerrainTileId())
 {
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(objectCountMutex);
+   std::lock_guard<std::mutex> lock(objectCountMutex);
    ++textureCount;
    std::cout << "ossimPlanetTexture2D count = " << textureCount << "\n";
 #endif   
@@ -47,7 +46,7 @@ ossimPlanetTexture2D::ossimPlanetTexture2D(const ossimPlanetTexture2D& text,cons
    :osg::Texture2D(text, copyop)
 {
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(objectCountMutex);
+   std::lock_guard<std::mutex> lock(objectCountMutex);
    ++textureCount;
    std::cout << "ossimPlanetTexture2D count = " << textureCount << "\n";
 #endif   
@@ -56,7 +55,7 @@ ossimPlanetTexture2D::ossimPlanetTexture2D(const ossimPlanetTexture2D& text,cons
 ossimPlanetTexture2D::~ossimPlanetTexture2D()
 {
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(objectCountMutex);
+   std::lock_guard<std::mutex> lock(objectCountMutex);
   --textureCount;
    std::cout << "ossimPlanetTexture2D count = " << textureCount << "\n";
 #endif

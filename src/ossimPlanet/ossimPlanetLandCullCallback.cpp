@@ -238,7 +238,7 @@ void ossimPlanetLandCullCallback::applyStandardCull(ossimPlanetPagedLandLod* n, 
    {
       ossim_uint32 idx = 0;
       
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lockChildList(n->theChildCullNodeListMutex);
+      std::lock_guard<std::recursive_mutex> lockChildList(n->theChildCullNodeListMutex);
       ossim_uint32 cullCount = 0;
       for(idx = 0; ((idx < n->theChildCullNodeList.size())&&n->theChildCullNodeList[idx].valid()); ++idx)
       {
@@ -309,7 +309,7 @@ void ossimPlanetLandCullCallback::applyStandardCull(ossimPlanetPagedLandLod* n, 
 void ossimPlanetLandCullCallback::applyOrthoCull(ossimPlanetPagedLandLod* n,
                                                  osg::NodeVisitor* nv)
 {
-   //OpenThreads::ScopedLock<OpenThreads::Mutex> lock(n->theMutex);
+   //std::lock_guard<std::recursive_mutex> lock(n->theMutex);
 
    osgUtil::CullVisitor* cullVisitor = dynamic_cast<osgUtil::CullVisitor*>(nv);
    if(n->theRefreshType == ossimPlanetLandRefreshType_PRUNE)

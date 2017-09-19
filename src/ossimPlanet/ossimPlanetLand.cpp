@@ -212,7 +212,7 @@ ossimPlanetLand::~ossimPlanetLand()
       theElevationDatabase->removeCallback( theTextureLayerCallback );
    }
    theStateSet = 0;
-  // OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+  // std::lock_guard<std::mutex> lock(theMutex);
    osgDB::Registry::instance()->removeReaderWriter(theReaderWriter.get());
 //    theNeighborhoodGraph = 0;
    theReaderWriter      = 0;
@@ -225,7 +225,7 @@ ossimPlanetLand::~ossimPlanetLand()
 void ossimPlanetLand::traverse(osg::NodeVisitor& nv)
 {
 //    static osg::Timer_t lastTick = osg::Timer::instance()->tick();
-   //OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   //std::lock_guard<std::mutex> lock(theMutex);
    switch(nv.getVisitorType())
    {
       case osg::NodeVisitor::UPDATE_VISITOR:
@@ -245,7 +245,7 @@ void ossimPlanetLand::traverse(osg::NodeVisitor& nv)
             resetGraphLocal();
          }
          {
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRefreshMutex);
+            std::lock_guard<std::recursive_mutex> lock(theRefreshMutex);
             if(theExtentRefreshList.size())
             {
 #if 0
@@ -325,7 +325,7 @@ void ossimPlanetLand::traverse(osg::NodeVisitor& nv)
       case osg::NodeVisitor::EVENT_VISITOR:
       {
 #if 0
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRefreshMutex);
+         std::lock_guard<std::recursive_mutex> lock(theRefreshMutex);
          if(theRedrawFlag)
          {
             osgGA::EventVisitor* ev = dynamic_cast<osgGA::EventVisitor*>(&nv);
@@ -444,7 +444,7 @@ void ossimPlanetLand::resetGraph(const osg::ref_ptr<ossimPlanetExtents> extents,
                                  ossimPlanetLandRefreshType refreshType)
 
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRefreshMutex);
+   std::lock_guard<std::recursive_mutex> lock(theRefreshMutex);
    
    osg::ref_ptr<ossimPlanetLand::refreshInfo> info = new ossimPlanetLand::refreshInfo;
    info->theRefreshType = refreshType;

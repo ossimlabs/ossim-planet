@@ -4,8 +4,7 @@
 #include <ossimPlanet/ossimPlanetGeoRefModel.h>
 #include <ossimPlanet/ossimPlanetCallback.h>
 #include <osg/MatrixTransform>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 
 class ossimPlanetLsrSpaceTransform;
 class OSSIMPLANET_DLL ossimPlanetLsrSpaceTransformCallback : public ossimPlanetCallback
@@ -50,7 +49,7 @@ public:
     */
    void copyParametersOnly(const ossimPlanetLsrSpaceTransform& src)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       dirtyBound();
       if(!theModel.valid())
       {
@@ -66,7 +65,7 @@ public:
     */
    const ossimPlanetGeoRefModel* model()const
    {      
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theModel.get();
    }
    
@@ -75,7 +74,7 @@ public:
     */
    ossimPlanetGeoRefModel* model()
    {      
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theModel.get();
    }
    
@@ -92,7 +91,7 @@ public:
     */
    double lat()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theLatLonAltitude[0];
    }
    
@@ -101,7 +100,7 @@ public:
     */
    double lon()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theLatLonAltitude[1];
    }
    
@@ -110,7 +109,7 @@ public:
     */
    double altitude()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theLatLonAltitude[2];
    }
    
@@ -119,7 +118,7 @@ public:
     */
    const osg::Vec3d& latLonAltitude()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theLatLonAltitude;
    }
    
@@ -129,7 +128,7 @@ public:
     */
    double x()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theXYZ[0];
    }
    
@@ -139,7 +138,7 @@ public:
     */
    double y()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theXYZ[1];
    }
    
@@ -149,7 +148,7 @@ public:
     */   
    double z()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theXYZ[2];
    }
    
@@ -159,7 +158,7 @@ public:
     */   
    const osg::Vec3d& xyz()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theXYZ;
    }
    
@@ -169,7 +168,7 @@ public:
     */
    double heading()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theHpr[0];
    }
    
@@ -179,7 +178,7 @@ public:
     */
    double pitch()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theHpr[1];
    }
    
@@ -189,7 +188,7 @@ public:
     */
    double roll()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theHpr[2];
    }
    
@@ -203,7 +202,7 @@ public:
     */
    double scalex()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theScale[0];
    }
    
@@ -212,7 +211,7 @@ public:
     */
    double scaley()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theScale[1];
    }
    
@@ -221,7 +220,7 @@ public:
     */
    double scalez()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theScale[2];
    }
    
@@ -230,7 +229,7 @@ public:
     */
    const osg::Vec3d& scale()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       return theScale;
    }
    
@@ -308,7 +307,7 @@ protected:
    /**
     * thePropertyMutex is used to synchronize access to any property value.
     */ 
-   mutable ossimPlanetReentrantMutex thePropertyMutex;
+   mutable std::recursive_mutex thePropertyMutex;
    
    /**
     * theOrientationMode specifies how to construct the matrix

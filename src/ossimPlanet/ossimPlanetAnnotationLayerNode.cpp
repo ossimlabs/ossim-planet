@@ -103,7 +103,7 @@ void ossimPlanetAnnotationPlacemark::traverse(osg::NodeVisitor& nv)
       return;
    }
    bool needRedraw = false;
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theUpdateMutex);
+	std::lock_guard<std::recursive_mutex> lock(theUpdateMutex);
    switch(nv.getVisitorType())
    {
       case osg::NodeVisitor::UPDATE_VISITOR:
@@ -176,7 +176,7 @@ void ossimPlanetAnnotationPlacemark::execute(const ossimPlanetAction& action)
    if(command == "Set")
    {
 		bool coordinateUpdating = false;
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theUpdateMutex);
+      std::lock_guard<std::recursive_mutex> lock(theUpdateMutex);
       if(xmlAction&&xmlAction->xmlNode().valid())
       {
          ossim_uint32 idx = 0;
@@ -492,7 +492,7 @@ void ossimPlanetAnnotationPlacemark::stage()
 					osg::MatrixTransform* m = new osg::MatrixTransform;
 					m->setMatrix(localToWorld);
 					{
-						OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theUpdateMutex);
+						std::lock_guard<std::recursive_mutex> lock(theUpdateMutex);
 						osg::Vec3d localNormal = osg::Matrixd::transform3x3(localToWorld, normal);
 						theLabel = new ossimPlanetFadeText();
 						theLabel->setText(name());

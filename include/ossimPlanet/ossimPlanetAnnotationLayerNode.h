@@ -13,6 +13,8 @@
 #include <ossimPlanet/ossimPlanetFadeText.h>
 #include <ossimPlanet/ossimPlanetOperation.h>
 #include <osg/Vec4d>
+#include <mutex>
+
 enum ossimPlanetAnnotationColorMode
 {
    ossimPlanetAnnotationColorMode_NORMAL = 0,
@@ -138,19 +140,19 @@ public:
 	virtual void update(){};
 	virtual void stage()
    {		
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       theStagedFlag = true;
    }
 	virtual bool isStaged()const
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+		std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
 		return theStagedFlag;
 	}
    virtual void traverse(osg::NodeVisitor& nv);
    
 	void setStagedFlag(bool flag)
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+		std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
 		theStagedFlag = flag;
 	}
    virtual ossimPlanetAnnotationGroupNode* asAnnotationGroup()
@@ -163,27 +165,27 @@ public:
    }
 	void setDirtyBits(DirtyBit bit)
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+		std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
 		theDirtyBit = bit;
 	}
 	void setDirtyBit(DirtyBit bit)
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+		std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
 		theDirtyBit |= (ossim_uint32)bit;
 	}
 	void clearDirtyBit(DirtyBit bit)
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+		std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
 		
 		theDirtyBit &= (~((ossim_uint32)bit));
 	}
 	bool isDirtyBitSet(DirtyBit bit)const
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+		std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
 		return (theDirtyBit & bit);
 	}
 protected:
-	mutable ossimPlanetReentrantMutex thePropertyMutex;
+	mutable std::recursive_mutex thePropertyMutex;
 	ossim_uint32 theDirtyBit;
 	bool theStagedFlag;
    osg::ref_ptr<ossimPlanetAnnotationExpireTime> theExpireTime;
@@ -419,12 +421,12 @@ public:
 	}
 	osg::ref_ptr<ossimPlanetAnnotationGeometry> geometry()
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theGeometryMutex);
+		std::lock_guard<std::recursive_mutex> lock(theGeometryMutex);
 		return theGeometry;
 	}
 	void setGeometry(osg::ref_ptr<ossimPlanetAnnotationGeometry> geom)
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theGeometryMutex);
+		std::lock_guard<std::recursive_mutex> lock(theGeometryMutex);
 		theGeometry = geom;
 	}
 	virtual void setEnableFlag(bool flag)
@@ -439,10 +441,10 @@ public:
 		ossimPlanetAnnotationLayerNode::setEnableFlag(flag);
 	}
 protected:
-   mutable ossimPlanetReentrantMutex theUpdateMutex;
+   mutable std::recursive_mutex theUpdateMutex;
 	osg::ref_ptr<osg::ClusterCullingCallback> theClusterCull;
 	osg::ref_ptr<ossimPlanetAnnotationTextGeode> theLabelGeode;
-	mutable ossimPlanetReentrantMutex theGeometryMutex;
+	mutable std::recursive_mutex theGeometryMutex;
 	osg::ref_ptr<ossimPlanetAnnotationGeometry> theGeometry;
    osg::ref_ptr<ossimPlanetFadeText> theLabel;
 	

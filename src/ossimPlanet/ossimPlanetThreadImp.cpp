@@ -14,13 +14,13 @@ int ossimPlanetThreadImp::cancel()
 
 void ossimPlanetThreadImp::setDoneFlag(bool flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theImpMutex);
+   std::lock_guard<std::recursive_mutex> lock(theImpMutex);
    theDoneFlag = flag;
 }
 
 bool ossimPlanetThreadImp::doneFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theImpMutex);
+   std::lock_guard<std::recursive_mutex> lock(theImpMutex);
    return theDoneFlag;
 }
 

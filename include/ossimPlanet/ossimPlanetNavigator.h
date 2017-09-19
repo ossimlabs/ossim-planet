@@ -16,9 +16,9 @@
 #include <osg/Matrixd>
 //#include <osgGA/MatrixManipulator>
 #include <osgGA/CameraManipulator>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossimPlanet/ossimPlanetDestinationCommandAction.h>
 #include <ossimPlanet/ossimPlanetXmlAction.h>
+#include <mutex>
 
 class ossimPlanet;
 class OSSIMPLANET_DLL ossimPlanetNavigator : public osg::Referenced//,
@@ -270,7 +270,7 @@ protected:
     LastAnimationParameter theLastAnimationParameter;
     osg::Timer_t theAnimationStartTime;
 
-    mutable ossimPlanetReentrantMutex theMutex;
+    mutable std::recursive_mutex theMutex;
     bool theUseTimedUpdateFlag;
     bool theRedrawFlag;
 };

@@ -21,11 +21,11 @@
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossimPlanet/ossimPlanetNavigator.h>
 #include <ossimPlanet/ossimPlanetActionReceiver.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossimPlanet/ossimPlanetViewMatrixBuilder.h>
 #include <osg/observer_ptr>
 #include <osg/Node>
-
+#include <mutex>
+ 
 class ossimPlanet;
 
 //class OSSIMPLANET_DLL ossimPlanetManipulator : public osgGA::MatrixManipulator,
@@ -287,7 +287,7 @@ protected:
    osg::Vec3d eyePosition()const;
 
    osg::ref_ptr<ossimPlanetNavigator> theNavigator;
-   mutable ossimPlanetReentrantMutex theMutex;
+   mutable std::recursive_mutex theMutex;
    osg::ref_ptr<osg::Node> theNode;
    bool theEventHandlingFlag;
    bool theUseFrameEventForUpdateFlag;

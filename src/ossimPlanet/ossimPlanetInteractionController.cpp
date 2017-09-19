@@ -72,13 +72,13 @@ void ossimPlanetInteractionController::bind(const std::string& event, const ossi
     if(event.empty()) return;
     //     assert(!event.empty());
 
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theBoundActionsMutex);
+   std::lock_guard<std::recursive_mutex> lock(theBoundActionsMutex);
     boundActions_[event] = a.clone();
 }
 
 void ossimPlanetInteractionController::unbind(const std::string& event)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theBoundActionsMutex);
+   std::lock_guard<std::recursive_mutex> lock(theBoundActionsMutex);
    std::map<std::string, osg::ref_ptr<ossimPlanetAction> >::iterator i = boundActions_.find(event);
     
     if (i != boundActions_.end())
@@ -89,7 +89,7 @@ void ossimPlanetInteractionController::unbind(const std::string& event)
 
 void ossimPlanetInteractionController::unbindAll()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theBoundActionsMutex);
+   std::lock_guard<std::recursive_mutex> lock(theBoundActionsMutex);
     boundActions_.clear();
 }
 
@@ -138,7 +138,7 @@ void ossimPlanetInteractionController::writeConfiguration(std::ostream& stream) 
 void ossimPlanetInteractionController::executeBoundAction(const std::string& event)
 {
     // Debug::log("InteractionController_events") << "--- " << event << std::endl;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theBoundActionsMutex);
+   std::lock_guard<std::recursive_mutex> lock(theBoundActionsMutex);
     
    std::map<std::string,osg::ref_ptr< ossimPlanetAction> >::const_iterator i = boundActions_.find(event);
     if (i != boundActions_.end()) 

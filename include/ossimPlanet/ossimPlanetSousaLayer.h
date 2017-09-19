@@ -5,10 +5,9 @@
 #include <ossimPlanet/ossimPlanetTextureLayerGroup.h>
 #include <ossimPlanet/ossimPlanetAnnotationLayer.h>
 #include <ossimPlanet/ossimPlanetXmlAction.h>
-#include <OpenThreads/Mutex>
 #include <map>
 #include <ossimPlanet/ossimPlanetArchive.h>
-
+#include <mutex>
 
 class ossimPlanet;
 class ossimPlanetKmlLayer;
@@ -80,11 +79,11 @@ protected:
    osg::ref_ptr<ossimPlanetAnnotationLayer>   theAnnotationLayer;
    osg::ref_ptr<ossimPlanetArchive>           theArchive;
    
-	ossimPlanetReentrantMutex theCameraTestDelayMutex;
+	 mutable std::recursive_mutex theCameraTestDelayMutex;
    ossim_int32 theCameraTestDelay;
-   mutable ossimPlanetReentrantMutex theUpdateMutex;
+   mutable std::recursive_mutex theUpdateMutex;
    
-   mutable ossimPlanetReentrantMutex theXmlActionThreadQueueMutex;
+   mutable std::recursive_mutex theXmlActionThreadQueueMutex;
 	
    osg::ref_ptr<ossimPlanetOperationThreadQueue> theXmlActionThreadQueue;
    

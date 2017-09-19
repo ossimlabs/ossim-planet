@@ -37,12 +37,12 @@ public:
    
    virtual void dirty()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theDirtyFlag = true;
    }
    virtual bool isDirty()const
    {      
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theDirtyFlag;
    }
    virtual void setDirtyFlag(bool flag)
@@ -53,7 +53,7 @@ public:
       }
       else
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+         std::lock_guard<std::mutex> lock(thePropertyMutex);
          theDirtyFlag = flag;
       }
    }
@@ -61,44 +61,44 @@ public:
    virtual void setMinMaxLevel(ossim_uint32 minLevel, 
                                ossim_uint32 maxLevel)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theMinLevel = minLevel;
       theMaxLevel = maxLevel;
    }
    ossim_uint32 minLevel()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theMinLevel;
    }
    ossim_uint32 maxLevel()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theMaxLevel;
    }
    osg::Texture::FilterMode minFilter()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theMinFilter;
    }
    osg::Texture::FilterMode magFilter()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theMagFilter;
    }
-   OpenThreads::Mutex& propertyMutex(){return thePropertyMutex;}
+   std::mutex& propertyMutex(){return thePropertyMutex;}
    virtual void setRefreshFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theRefreshFlag = flag;
    }
    virtual bool refreshFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theRefreshFlag;
    }
    
 protected:
-   mutable OpenThreads::Mutex thePropertyMutex;
+   mutable std::mutex thePropertyMutex;
    bool theDirtyFlag;
    bool theRefreshFlag;
    ossim_uint32 theMinLevel;
@@ -132,7 +132,7 @@ public:
    
    virtual void setImage(ossimPlanetImage* image)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theImage = image;
       if(theImage.valid())
       {
@@ -142,7 +142,7 @@ public:
    }
    ossimPlanetImage* cloneImage()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       if(theImage.valid())
       {
          return new ossimPlanetImage(*theImage.get());
@@ -151,18 +151,18 @@ public:
    }
    ossimPlanetImage* image()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theImage.get();
    }
    const ossimPlanetImage* image()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       return theImage.get();
    }
    virtual void dirty()
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+         std::lock_guard<std::mutex> lock(thePropertyMutex);
          if(theImage.valid())
          {
             theImage->dirty();
@@ -172,7 +172,7 @@ public:
    }
    ossim_uint32 modifiedCount()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       if(!theImage) return 0;
       return theImage->getModifiedCount();
    }

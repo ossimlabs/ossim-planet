@@ -1,11 +1,12 @@
 #include <iostream>
 #include <ossimPlanet/ossimPlanetImage.h>
-#include <OpenThreads/ScopedLock>
 #include <ossim/imaging/ossimImageHandlerRegistry.h>
 #include <ossim/imaging/ossimImageHandler.h>
 #include <ossim/base/ossimHsiVector.h>
 #include <ossim/base/ossimRgbVector.h>
 #include <osgDB/ReadFile>
+#include <mutex>
+
 //#define OSGPLANET_ENABLE_ALLOCATION_COUNT
 #ifdef OSGPLANET_ENABLE_ALLOCATION_COUNT
 static ossim_uint32 imageCount = 0;
@@ -123,7 +124,7 @@ void ossimPlanetImage::setState(ossimPlanetImageStateType stateType)
    theState = stateType;
 }
 
-OpenThreads::Mutex& ossimPlanetImage::mutex()const
+std::recursive_mutex& ossimPlanetImage::mutex()const
 {
    return theMutex;
 }

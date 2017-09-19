@@ -1,12 +1,12 @@
 #include <ossimPlanet/ossimPlanetIdManager.h>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 
 ossimPlanetId ossimPlanetIdManager::theCurrentId = 0;
-ossimPlanetReentrantMutex ossimPlanetIdManager::theMutex;
+std::recursive_mutex ossimPlanetIdManager::theMutex;
 
 ossimPlanetId ossimPlanetIdManager::nextId()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    
    return ++theCurrentId;
 }

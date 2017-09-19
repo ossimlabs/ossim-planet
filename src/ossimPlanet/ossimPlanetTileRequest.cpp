@@ -128,7 +128,7 @@ void ossimPlanetTileRequestQueue::sort()
 {
    if(theSortFlag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+      std::lock_guard<std::mutex> lock(theOperationQueueMutex);
       theOperationQueue.sort(ossimPlanetTileRequest::SortFunctor());
    }
 }
@@ -136,7 +136,7 @@ void ossimPlanetTileRequestQueue::sort()
 osg::ref_ptr<ossimPlanetOperation> ossimPlanetTileRequestQueue::nextOperation(bool blockIfEmptyFlag)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+      std::lock_guard<std::mutex> lock(theOperationQueueMutex);
       ossimPlanetOperation::List::iterator iter = theOperationQueue.begin();
       ossimPlanetOperation::List::iterator endIter = theOperationQueue.end();
       
@@ -183,7 +183,7 @@ void ossimPlanetTileRequestQueue::add(ossimPlanetTileRequest* request)
    {
       if(request->referenceCount() == 1)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+         std::lock_guard<std::mutex> lock(theOperationQueueMutex);
          request->setState(ossimPlanetOperation::READY_STATE);
          theOperationQueue.push_back(request);
       }
@@ -212,7 +212,7 @@ void ossimPlanetTileRequestThreadQueue::run()
       osg::ref_ptr<ossimPlanetOperationQueue> queue;
       
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+         std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
          queue = theOperationQueue;
       }
       operation = queue->nextOperation(true);
@@ -225,7 +225,7 @@ void ossimPlanetTileRequestThreadQueue::run()
          if(request&&request->isRequestCurrent(theCurrentFrameNumber))
          {
             {
-               OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+               std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
                theCurrentOperation = operation;
             }
             
@@ -254,7 +254,7 @@ void ossimPlanetTileRequestThreadQueue::run()
                }
             }
             {            
-               OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+               std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
                theCurrentOperation = 0;
             }
          }
@@ -274,7 +274,7 @@ void ossimPlanetTileRequestThreadQueue::run()
 #if 0
 void ossimPlanetTerrain::TileRequestThreadQueue::applyToGraph(double availableTime)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theFinishedOperationsListMutex);
+   std::lock_guard<std::mutex> lock(theFinishedOperationsListMutex);
    osg::Timer_t startTick = osg::Timer::instance()->tick();
    bool doneFlag = theFinishedOperationsList.empty();
    ossim_uint32 operationCount = 0;
@@ -557,7 +557,7 @@ ossimPlanetTextureRequest::ossimPlanetTextureRequest(ossimPlanetTerrainTile* til
 
 void ossimPlanetTextureRequest::setTextureLayerIndices(const std::vector<ossim_uint32>& values)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::mutex> lock(thePropertyMutex);
    ossim_uint32 idx;
    theResultList.clear();
    for(idx = 0; idx < values.size();++idx)

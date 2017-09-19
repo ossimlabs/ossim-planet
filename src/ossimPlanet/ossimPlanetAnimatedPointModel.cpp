@@ -165,7 +165,7 @@ void ossimPlanetAnimatedPointModel::stage()
 
 void ossimPlanetAnimatedPointModel::updateCoordinates()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theUpdateCoordinatesMutex);
+   std::lock_guard<std::mutex> lock(theUpdateCoordinatesMutex);
    if(theAnimationPath.valid())
    {
       ossimPlanetAnimationPath::PointList pointList;
@@ -218,7 +218,7 @@ void ossimPlanetAnimatedPointModel::updateCoordinates()
 
 void ossimPlanetAnimatedPointModel::updateColor()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theUpdateColorMutex);
+   std::lock_guard<std::mutex> lock(theUpdateColorMutex);
    if(thePathColor->size() != 1)
    {
       thePathColor->push_back(theAnimationPathColor);

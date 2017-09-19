@@ -1295,7 +1295,7 @@ void ossimPlanetTerrainGeometryTechnique::init(ossimPlanetTerrainTile* optionalP
 {
    if(!theTerrainTile) return;
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildNodeCullParametersMutex);
+      std::lock_guard<std::recursive_mutex> lock(theChildNodeCullParametersMutex);
       if(!theChildNodeCullParameters.size())
       {
          theChildNodeCullParameters.resize(4);
@@ -1476,7 +1476,7 @@ void ossimPlanetTerrainGeometryTechnique::setChildCullParameters(ossimPlanetTerr
                                                                  osg::ref_ptr<CullNode> cullNode)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildNodeCullParametersMutex);
+      std::lock_guard<std::recursive_mutex> lock(theChildNodeCullParametersMutex);
       
       if(theChildNodeCullParameters.size() != 4)
       {
@@ -1638,7 +1638,7 @@ void ossimPlanetTerrainGeometryTechnique::updateTextureMatrix(osg::StateSet* sta
 
 void ossimPlanetTerrainGeometryTechnique::setElevationMeshFrom(ossimPlanetTerrainTile* tile)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTerrainTileMutex);
+   std::lock_guard<std::mutex> lock(theTerrainTileMutex);
    
    if(tile&&theTerrainTile)
    {

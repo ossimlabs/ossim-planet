@@ -8,7 +8,6 @@
 #include <ossimPlanet/ossimPlanetActionReceiver.h>
 #include <ossimPlanet/ossimPlanetVisitors.h>
 #include <ossim/base/ossimString.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <OpenThreads/ReadWriteMutex>
 
 class ossimPlanetNode;
@@ -39,17 +38,17 @@ public:
 	static void remove(osg::Node* node);
 	virtual void setLayer(ossimPlanetLayer* layer)
 	{
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
 		theLayer = layer;
 	}
 	ossimPlanetLayer* layer()
 	{
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
 		return theLayer;
 	}
 	const ossimPlanetLayer* layer()const
 	{
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
 		return theLayer;
 	}
    virtual bool addChild( Node *child );
@@ -58,14 +57,14 @@ public:
    bool removeChildren(unsigned int pos,unsigned int numChildrenToRemove);
    bool enableFlag()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       return theEnableFlag;
    }
    virtual void setEnableFlag(bool flag)
    {
       bool changed = flag!=enableFlag();
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
          theEnableFlag = flag;
       }
       if(changed) setRedrawFlag(true);
@@ -73,30 +72,30 @@ public:
    }
    bool intersectFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       
       return theIntersectableFlag;
    }
    virtual void setIntersectFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       theIntersectableFlag = flag;
    }
    virtual void setRedrawFlag(bool flag);
    bool redrawFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodeRedrawPropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodeRedrawPropertyMutex);
       return theRedrawFlag;
    }
    const ossimString& id()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       return theId;
    }
    virtual void setId(const ossimString& id)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
          theId = id;
       }
       notifyPropertyChanged(this, "id");
@@ -104,52 +103,52 @@ public:
    virtual void setName(const ossimString& value)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
          theName = value;
       }
       notifyPropertyChanged(this, "name");
    }
    const ossimString& name()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       return theName;
    }
    void name(ossimString& value)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       value = theName;
    }
    virtual void setDescription(const ossimString& value)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
          theDescription = value;
       }
       notifyPropertyChanged(this, "description");
    }
    const ossimString& description()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       return theDescription;
    }
    void description(ossimString& value)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       value = theDescription;
    }
    virtual osg::ref_ptr<ossimPlanetLookAt> lookAt()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       return theLookAt;
    }
    virtual const osg::ref_ptr<ossimPlanetLookAt> lookAt()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       return theLookAt;
    }
    virtual void lookAt(ossimPlanetLookAt& result)const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
       if(theLookAt.valid())
       {
          result = *theLookAt;
@@ -158,7 +157,7 @@ public:
    virtual void setLookAt(osg::ref_ptr<ossimPlanetLookAt> value)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodePropertyMutex);
+         std::lock_guard<std::recursive_mutex> lock(thePlanetNodePropertyMutex);
          theLookAt = value;
       }
       notifyPropertyChanged(this, "LookAt");
@@ -178,8 +177,8 @@ public:
 protected:
    virtual void nodeAdded(osg::Node* /*node*/){}
 	virtual void nodeRemoved(osg::Node* /*node*/){}
-   mutable OpenThreads::ReentrantMutex thePlanetNodeRedrawPropertyMutex;
-   mutable OpenThreads::ReentrantMutex thePlanetNodePropertyMutex;
+   mutable std::recursive_mutex thePlanetNodeRedrawPropertyMutex;
+   mutable std::recursive_mutex thePlanetNodePropertyMutex;
    
    bool        theEnableFlag;
    bool        theIntersectableFlag;

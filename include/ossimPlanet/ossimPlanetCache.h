@@ -2,7 +2,6 @@
 #define ossimPlanetCache_HEADER
 #include <osg/Referenced>
 #include <osg/Timer>
-#include <OpenThreads/ReentrantMutex>
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossimPlanet/ossimPlanetImage.h>
 #include <ossimPlanet/ossimPlanetOperation.h>
@@ -32,12 +31,12 @@ public:
    }
    void setEnabledFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       theEnabledFlag = flag;
    }
    bool enabledFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       return theEnabledFlag;
    }
    virtual void clean() = 0;
@@ -48,13 +47,13 @@ public:
 
   void setMinMaxCacheSizeInBytes(ossim_int64 minSize, ossim_int64 maxSize)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       theMinCacheSize = minSize<maxSize?minSize:maxSize;
       theMaxCacheSize = minSize>maxSize?minSize:maxSize;
    }
    void setMinMaxCacheSizeInMegaBytes(ossim_int64 minSize, ossim_int64 maxSize)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       theMinCacheSize = minSize<maxSize?minSize:maxSize;
       theMaxCacheSize = minSize>maxSize?minSize:maxSize;
       theMinCacheSize *= static_cast<ossim_int64>(1024*1024);
@@ -62,7 +61,7 @@ public:
    }
    void setMinMaxCacheSizeInGigaBytes(ossim_int64 minSize, ossim_int64 maxSize)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       theMinCacheSize = minSize<maxSize?minSize:maxSize;
       theMaxCacheSize = minSize>maxSize?minSize:maxSize;
       theMinCacheSize *= static_cast<ossim_int64>(1024*1024*1024);
@@ -70,32 +69,32 @@ public:
    }
    ossim_int64 cacheSizeInBytes()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       return theCurrentCacheSize;
    }
    ossim_int64 maxCacheSizeInBytes()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       return theMaxCacheSize;
    }
    ossim_int64 minCacheSizeInBytes()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       return theMinCacheSize;
    }
    bool exceedsMaxCacheSize()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       return (theCurrentCacheSize>theMaxCacheSize);
    }
    bool exceedsMinCacheSize()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       return (theCurrentCacheSize>theMinCacheSize);
    }
 
 protected:
-   mutable OpenThreads::Mutex theMutex;
+   mutable std::mutex theMutex;
    ossim_int64 theCurrentCacheSize;
    ossim_int64 theMinCacheSize;
    ossim_int64 theMaxCacheSize;
@@ -112,7 +111,7 @@ public:
    }
    virtual void clean()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       theCurrentCacheSize = 0;
       theTileCache.clear();
    }

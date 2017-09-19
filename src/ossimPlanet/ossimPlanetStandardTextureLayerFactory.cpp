@@ -2,10 +2,10 @@
 #include <ossimPlanet/ossimPlanetOssimImageLayer.h>
 #include <ossimPlanet/ossimPlanetWmsImageLayer.h>
 #include <ossimPlanet/ossimPlanetTextureLayerGroup.h>
-#include <OpenThreads/ScopedLock>
 #include <ossim/base/ossimKeywordNames.h>
 #include <sstream>
 #include <wms/wmsUrl.h>
+#include <mutex>
 
 ossimPlanetStandardTextureLayerFactory* ossimPlanetStandardTextureLayerFactory::theInstance=0;
 
@@ -26,7 +26,7 @@ ossimPlanetStandardTextureLayerFactory* ossimPlanetStandardTextureLayerFactory::
 
 osg::ref_ptr<ossimPlanetTextureLayer> ossimPlanetStandardTextureLayerFactory::createLayer(const ossimString& name, bool openAllEntriesFlag)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    osg::ref_ptr<ossimPlanetTextureLayer> result;
 
    ossimFilename filename = name;

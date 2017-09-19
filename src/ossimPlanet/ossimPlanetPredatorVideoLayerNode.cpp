@@ -455,7 +455,7 @@ void ossimPlanetFFMpegImageStream::pause()
 
 void ossimPlanetFFMpegImageStream::rewind()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theVideo->setFirstFrameFlag(false);
    theVideo->seek(0.0, ossimPredatorVideo::SEEK_ABSOLUTE);
    updateThreadBlock();
@@ -611,7 +611,7 @@ bool ossimPlanetPredatorVideoLayerNode::open(const ossimFilename& file)
 
 void ossimPlanetPredatorVideoLayerNode::setVideo(ossimPredatorVideo* video)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePredatorTraverseMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePredatorTraverseMutex);
    theCurrentFrame->cancel();
 
    theGeometryFlag = false;
@@ -717,7 +717,7 @@ ossim_float64 ossimPlanetPredatorVideoLayerNode::referenceTime()const
 
 void ossimPlanetPredatorVideoLayerNode::setRenderMode(ossimPlanetVideoLayerNode::RenderMode mode)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePredatorTraverseMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePredatorTraverseMutex);
    if(mode == ossimPlanetVideoLayerNode::RENDER_OVERLAY)
    {
       std::cout << "ossimPlanetPredatorVideoLayerNode::setRenderMode: OVERLAY REDNERING NOT SUPPORTED YET!" << std::endl;
@@ -752,7 +752,7 @@ void ossimPlanetPredatorVideoLayerNode::setRenderMode(ossimPlanetVideoLayerNode:
 
 void ossimPlanetPredatorVideoLayerNode::traverse(osg::NodeVisitor& nv)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePredatorTraverseMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePredatorTraverseMutex);
    bool traverseChildrenFlag = !theCullFlag&&theEnableFlag;
    
    switch(nv.getVisitorType())

@@ -29,7 +29,7 @@ void ossimPlanetIoThread::addIo(osg::ref_ptr<ossimPlanetIo> io,
 
 void ossimPlanetIoThread::execute(const ossimPlanetAction &a)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theDelayedExecutionMutex);
+   std::lock_guard<std::recursive_mutex> lock(theDelayedExecutionMutex);
    theDelayedExecution.push(a.clone());
    if(!startedFlag())
    {
@@ -39,7 +39,7 @@ void ossimPlanetIoThread::execute(const ossimPlanetAction &a)
 
 void ossimPlanetIoThread::sendMessage(osg::ref_ptr<ossimPlanetMessage> message, bool forceSendFlag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theIoListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theIoListMutex);
    std::vector<osg::ref_ptr<ossimPlanetIo> >::iterator iter = theIoList.begin();
    while(iter != theIoList.end())
    {
@@ -66,7 +66,7 @@ bool ossimPlanetIoThread::sendMessage(const ossimString& searchName,
 osg::ref_ptr<ossimPlanetIo> ossimPlanetIoThread::removeIoGivenSearchString(const ossimString& searchString)
 {
    osg::ref_ptr<ossimPlanetIo> result = 0;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theIoListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theIoListMutex);
    std::vector<osg::ref_ptr<ossimPlanetIo> >::iterator iter = theIoList.begin();
    ossimString tempSearchString;
    while(iter != theIoList.end())
@@ -91,7 +91,7 @@ osg::ref_ptr<ossimPlanetIo> ossimPlanetIoThread::removeIoGivenSearchString(const
 osg::ref_ptr<ossimPlanetIo> ossimPlanetIoThread::findIo(const ossimString& searchString)
 {
    osg::ref_ptr<ossimPlanetIo> result = 0;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theIoListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theIoListMutex);
    std::vector<osg::ref_ptr<ossimPlanetIo> >::iterator iter = theIoList.begin();
    ossimString tempSearchString;
    while(iter != theIoList.end())
@@ -110,7 +110,7 @@ osg::ref_ptr<ossimPlanetIo> ossimPlanetIoThread::findIo(const ossimString& searc
 const osg::ref_ptr<ossimPlanetIo> ossimPlanetIoThread::findIo(const ossimString& searchString)const
 {
    const osg::ref_ptr<ossimPlanetIo> result = 0;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theIoListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theIoListMutex);
    std::vector<osg::ref_ptr<ossimPlanetIo> >::const_iterator iter = theIoList.begin();
    ossimString tempSearchString;
    while(iter != theIoList.end())
@@ -129,7 +129,7 @@ const osg::ref_ptr<ossimPlanetIo> ossimPlanetIoThread::findIo(const ossimString&
 
 bool ossimPlanetIoThread::removeIo(osg::ref_ptr<ossimPlanetIo> io)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theIoListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theIoListMutex);
    std::vector<osg::ref_ptr<ossimPlanetIo> >::iterator iter = theIoList.begin();
    ossimString tempSearchString;
    while(iter != theIoList.end())
@@ -154,7 +154,7 @@ void ossimPlanetIoThread::run()
    {
       {
          
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theLoopMutex);
+         std::lock_guard<std::recursive_mutex> lock(theLoopMutex);
          if(!pauseFlag())
          {
             theDelayedExecutionMutex.lock();
@@ -203,7 +203,7 @@ int ossimPlanetIoThread::cancel()
 
 bool ossimPlanetIoThread::addMessageHandler(osg::ref_ptr<ossimPlanetIoMessageHandler> handler)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageHandlerListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageHandlerListMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; idx < theMessageHandlerList.size(); ++idx)
    {
@@ -218,7 +218,7 @@ bool ossimPlanetIoThread::addMessageHandler(osg::ref_ptr<ossimPlanetIoMessageHan
 
 bool ossimPlanetIoThread::removeMessageHandler(osg::ref_ptr<ossimPlanetIoMessageHandler> handler)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageHandlerListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageHandlerListMutex);
    ossimPlanetIoThread::MessageHandlerListType::iterator iter = theMessageHandlerList.begin();
 
    while(iter != theMessageHandlerList.end())
@@ -236,7 +236,7 @@ bool ossimPlanetIoThread::removeMessageHandler(osg::ref_ptr<ossimPlanetIoMessage
 
 bool ossimPlanetIoThread::removeMessageHandler(const ossimString& handlerName)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageHandlerListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageHandlerListMutex);
    ossimPlanetIoThread::MessageHandlerListType::iterator iter = theMessageHandlerList.begin();
 
    while(iter != theMessageHandlerList.end())
@@ -265,25 +265,25 @@ void ossimPlanetIoThread::clearIo()
 
 bool ossimPlanetIoThread::startedFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theStartedFlag;
 }
 
 void ossimPlanetIoThread::setStartedFlag(bool flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theStartedFlag = flag;
 }
    
 bool ossimPlanetIoThread::doneFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theDoneFlag;
 }
 
 void ossimPlanetIoThread::setDoneFlag(bool flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theDoneFlag = flag;
 }
 
@@ -291,32 +291,32 @@ void ossimPlanetIoThread::setPauseFlag(bool flag, bool waitTilPaused)
 {
    if(waitTilPaused)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock1(theLoopMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock1(theLoopMutex);
+      std::lock_guard<std::recursive_mutex> lock2(thePropertyMutex);
       thePauseFlag = flag;
    }
    else
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
       thePauseFlag = flag;
    }
 }
 
 bool ossimPlanetIoThread::pauseFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return thePauseFlag;
 }
 
 bool ossimPlanetIoThread::startCalledFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theStartCalledFlag;  
 }
 
 void ossimPlanetIoThread::setStartCalledFlag(bool flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theStartCalledFlag = flag;
 }
 
@@ -333,7 +333,7 @@ void ossimPlanetIoThread::start()
 void ossimPlanetIoThread::handleMessage(osg::ref_ptr<ossimPlanetMessage> msg)
 {
    ossim_uint32 idx = 0;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMessageHandlerListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMessageHandlerListMutex);
    for(idx = 0; idx < theMessageHandlerList.size();++idx)
    {
       if(theMessageHandlerList[idx]->handleMessage(msg))

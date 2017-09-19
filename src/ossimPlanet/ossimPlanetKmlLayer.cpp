@@ -299,7 +299,7 @@ ossimPlanetKmlLayer::ossimPlanetKmlLayer()
 
 void ossimPlanetKmlLayer::traverse(osg::NodeVisitor& nv)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theGraphMutex);
+   std::lock_guard<std::recursive_mutex> lock(theGraphMutex);
    
    switch(nv.getVisitorType())
    {
@@ -310,7 +310,7 @@ void ossimPlanetKmlLayer::traverse(osg::NodeVisitor& nv)
             thePlanet = ossimPlanet::findPlanet(this);
          }
          {
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theNodesToAddListMutex);
+            std::lock_guard<std::mutex> lock(theNodesToAddListMutex);
             if(theNodesToAddList.size()>0)
             {
                ossim_uint32 idx = 0;
@@ -364,7 +364,7 @@ void ossimPlanetKmlLayer::addKml(osg::ref_ptr<ossimPlanetKmlObject> kml)
 void ossimPlanetKmlLayer::addKml(osg::ref_ptr<osg::Group> parent,
                                  osg::ref_ptr<ossimPlanetKmlObject> kml)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReadyToProcessKmlListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theReadyToProcessKmlListMutex);
    ossimPlanetStageKmlOperation* operation = new ossimPlanetStageKmlOperation(this);  
    operation->setKmlObject(kml);
    operation->setParent(parent.get());
@@ -373,7 +373,7 @@ void ossimPlanetKmlLayer::addKml(osg::ref_ptr<osg::Group> parent,
 
 void ossimPlanetKmlLayer::addKml(const ossimFilename& kmlFile)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReadyToProcessKmlListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theReadyToProcessKmlListMutex);
    ossimPlanetStageKmlOperation* operation = new ossimPlanetStageKmlOperation(this);  
    operation->setFile(kmlFile);
    theOperationQueue->add(operation);
@@ -460,7 +460,7 @@ void ossimPlanetKmlLayer::deleteNode(const ossimString& id)
    this->accept(nv);
    if(nv.layerList().size())
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theGraphMutex);
+      std::lock_guard<std::recursive_mutex> lock(theGraphMutex);
       FindNodeVisitor::LayerNodeList&  layerList = nv.layerList();
       ossim_uint32 idx = 0;
       for(idx = 0; idx < layerList.size(); ++idx)
@@ -477,7 +477,7 @@ void ossimPlanetKmlLayer::deleteNode(const ossimString& id)
 void ossimPlanetKmlLayer::readyToAddNode(osg::Group* parent, 
                                          osg::Node* node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theNodesToAddListMutex);
+   std::lock_guard<std::mutex> lock(theNodesToAddListMutex);
 
    theNodesToAddList.push_back(NodeToAddInfo(parent, node));
    setRedrawFlag(true);

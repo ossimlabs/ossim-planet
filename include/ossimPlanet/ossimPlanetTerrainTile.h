@@ -173,7 +173,7 @@ public:
 protected:
    virtual void childInserted(unsigned int /*pos*/);
    
-   mutable ossimPlanetReentrantMutex thePropertyMutex; 
+   mutable std::recursive_mutex thePropertyMutex; 
    ossimPlanetTerrainTileId theId;
 
    osg::ref_ptr<ossimPlanetGrid> theGrid;

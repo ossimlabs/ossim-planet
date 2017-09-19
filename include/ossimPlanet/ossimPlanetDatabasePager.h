@@ -3,7 +3,8 @@
 #include <osgDB/DatabasePager>
 #include <ossimPlanet/ossimPlanetExport.h>
 //#include <ossimPlanet/ossimPlanetCallback.h>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
+#include <mutex>
+
 class OSSIMPLANET_DLL ossimPlanetDatabasePager : public osgDB::DatabasePager
 {
 public:
@@ -58,7 +59,7 @@ protected:
    void notifyDoingWork();
    void notifyNoMoreWork();
    void notifyUpdateSceneGraph();
-   ossimPlanetReentrantMutex theCallbackListMutex;
+   std::recursive_mutex theCallbackListMutex;
    ossimPlanetDatabasePager::CallbackListType theCallbackList;
 //   SceneNotificationCallbackListType theCallbackList;
 #endif

@@ -5,9 +5,8 @@
 #include <ossimPlanet/ossimPlanetTextureLayerRegistry.h>
 #include <osg/CoordinateSystemNode>
 #include <osg/io_utils>
-#include <OpenThreads/ScopedLock>
 #include <osgUtil/IncrementalCompileOperation>
-
+#include <mutex>
 class ossimPlanetViewerFindNodesVisitor : public osg::NodeVisitor
 {
 public:
@@ -445,19 +444,19 @@ void ossimPlanetViewer::requestRedraw()
 
 void ossimPlanetViewer::requestContinuousUpdate(bool needed)
 {  
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
   theContinousUpdateFlag=needed;
 }
 
 void ossimPlanetViewer::requestWarpPointer(float x,float y)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    theWarpPointerFlag = true; theWarpX=x; theWarpY=y;
 }
 
 bool ossimPlanetViewer::getAndSetRedrawFlag(bool newValue)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    bool result = theRedrawFlag;
    theRedrawFlag = newValue;
    return result;
@@ -465,43 +464,43 @@ bool ossimPlanetViewer::getAndSetRedrawFlag(bool newValue)
 
 bool ossimPlanetViewer::getRedrawFlag()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    return theRedrawFlag;
 }
 
 void ossimPlanetViewer::setRedrawFlag(bool flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    theRedrawFlag=flag;
 }
 
 bool ossimPlanetViewer::redrawFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    return theRedrawFlag;
 }
 
 void ossimPlanetViewer::setContinuousUpdateFlag(bool flag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    theContinousUpdateFlag=flag;
 }
 
 bool ossimPlanetViewer::continuousUpdateFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    return theContinousUpdateFlag;
 }
 
 bool ossimPlanetViewer::warpPointerFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    return theWarpPointerFlag;
 }
 
 void ossimPlanetViewer::getWarpPoints(float& x, float& y)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionAdapterMutex);
+   std::lock_guard<std::mutex> lock(theActionAdapterMutex);
    x=theWarpX; 
    y=theWarpY;
 }
@@ -918,7 +917,7 @@ bool ossimPlanetViewer::getLatLonHeightAtWindowCoordinate(osg::Vec3d& llh,
 
 void ossimPlanetViewer::notifyViewChanged()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx = 0;
    ossim_uint32 upper = theCallbackList.size();

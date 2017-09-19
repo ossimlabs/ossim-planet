@@ -103,7 +103,7 @@ ossimPlanetTextureLayerGroup::~ossimPlanetTextureLayerGroup()
 
 ossimPlanetTextureLayer* ossimPlanetTextureLayerGroup::dup()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
 
    return new ossimPlanetTextureLayerGroup(*this);
 }
@@ -120,7 +120,7 @@ ossimString ossimPlanetTextureLayerGroup::getClassName()const
 
 ossimPlanetTextureLayerStateCode ossimPlanetTextureLayerGroup::updateExtents()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
 
    theStateCode = ossimPlanetTextureLayer_VALID;
    ossim_uint32 idx;
@@ -147,7 +147,7 @@ ossimPlanetTextureLayerStateCode ossimPlanetTextureLayerGroup::updateExtents()
 
 void ossimPlanetTextureLayerGroup::updateStats()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock2(theChildrenListMutex);
    theStats->setTotalTextureSize(0);
    theStats->setBytesTransferred(0);
    ossim_uint32 idx;
@@ -163,7 +163,7 @@ void ossimPlanetTextureLayerGroup::updateStats()const
 
 void ossimPlanetTextureLayerGroup::resetStats()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock2(theChildrenListMutex);
    ossim_uint32 idx;
    theStats->setBytesTransferred(0);
    theStats->setTotalTextureSize(0);
@@ -233,7 +233,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetTextureLayerGroup::getTexture(ossim_ui
    {
       updateExtents();
    }
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    osg::ref_ptr<ossimPlanetExtents> tileExtents = new ossimPlanetExtents;
    if(grid.convertToGeographicExtents(tileId, *tileExtents, width, height))
    {
@@ -379,7 +379,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetTextureLayerGroup::getTexture(ossim_ui
    {
       updateExtents();
    }
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
 
    ossim_uint32 idx = 0;
    osg::ref_ptr<ossimPlanetImage> result;
@@ -501,7 +501,7 @@ bool ossimPlanetTextureLayerGroup::replaceLayer(ossim_uint32 idx,
                                                 osg::ref_ptr<ossimPlanetTextureLayer> layer, 
                                                 bool notifyFlag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
     bool result = false;
     if(layer.valid()&&idx < theChildrenList.size())
     {
@@ -532,7 +532,7 @@ bool ossimPlanetTextureLayerGroup::addTop(osg::ref_ptr<ossimPlanetTextureLayer> 
                                           bool notifyFlag)
 {
    if(layer.get() == this) return false;
-//   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+//   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    bool result = false;
    
    if(layer.valid())
@@ -708,7 +708,7 @@ void ossimPlanetTextureLayerGroup::removeLayers(ossim_uint32 idx, ossim_uint32 l
 {
   std::vector<osg::ref_ptr<ossimPlanetTextureLayer> > layerList;
   {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
 
    layerList = removeLayersNoMutex(idx, length, false);
   }
@@ -743,7 +743,7 @@ ossimPlanetTextureLayer* ossimPlanetTextureLayerGroup::findLayerByName(const oss
    std::queue<ossimPlanetTextureLayer*> tempQueue;
    
    if(name() == layerName) return this;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; (idx < theChildrenList.size());++idx)
    {
@@ -770,7 +770,7 @@ const ossimPlanetTextureLayer* ossimPlanetTextureLayerGroup::findLayerByName(con
    std::queue<const ossimPlanetTextureLayer*> tempQueue;
    
    if(theName == layerName) return this;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; (idx < theChildrenList.size());++idx)
    {
@@ -826,7 +826,7 @@ ossimPlanetTextureLayer* ossimPlanetTextureLayerGroup::findLayerById(const ossim
    std::queue<ossimPlanetTextureLayer*> tempQueue;
    
    if(theId == layerId) return this;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; (idx < theChildrenList.size());++idx)
    {
@@ -853,7 +853,7 @@ const ossimPlanetTextureLayer* ossimPlanetTextureLayerGroup::findLayerById(const
    std::queue<const ossimPlanetTextureLayer*> tempQueue;
    
    if(theId == layerId) return this;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    ossim_uint32 idx = 0;
    for(idx = 0; (idx < theChildrenList.size());++idx)
    {
@@ -943,26 +943,26 @@ ossim_int32 ossimPlanetTextureLayerGroup::findLayerIndexNoMutex(osg::ref_ptr<oss
 
 ossim_int32 ossimPlanetTextureLayerGroup::findLayerIndex(osg::ref_ptr<ossimPlanetTextureLayer> layer)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
 
    return findLayerIndexNoMutex(layer);
 }
 
 bool ossimPlanetTextureLayerGroup::containsLayer(osg::ref_ptr<ossimPlanetTextureLayer> layer)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    return containsLayerNoMutex(layer);
 }
 
 ossim_uint32 ossimPlanetTextureLayerGroup::numberOfLayers()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    return theChildrenList.size();
 }
 
 const osg::ref_ptr<ossimPlanetTextureLayer> ossimPlanetTextureLayerGroup::layer(ossim_uint32 idx)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    if(idx < theChildrenList.size())
    {
       return theChildrenList[idx];
@@ -973,7 +973,7 @@ const osg::ref_ptr<ossimPlanetTextureLayer> ossimPlanetTextureLayerGroup::layer(
 
 osg::ref_ptr<ossimPlanetTextureLayer> ossimPlanetTextureLayerGroup::layer(ossim_uint32 idx)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
    if(idx < theChildrenList.size())
    {
       return theChildrenList[idx];
@@ -1023,7 +1023,7 @@ void ossimPlanetTextureLayerGroup::setFillTranslucentPixelsWithBackground(bool o
 
 void ossimPlanetTextureLayerGroup::sortByGsd()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenListMutex);
+   std::lock_guard<std::mutex> lock(theChildrenListMutex);
 
    std::sort(theChildrenList.begin(),
              theChildrenList.end(),

@@ -548,7 +548,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetDtedElevationDatabase::getTexture(ossi
 
 osg::ref_ptr<ossimPlanetDtedElevationDatabase::DtedInfo> ossimPlanetDtedElevationDatabase::getInfo(const std::string& name)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theDtedInfoMutex);
+   std::lock_guard<std::recursive_mutex> lock(theDtedInfoMutex);
    DtedFilePointerList::iterator iter = theFilePointers.find(name);
 
    if(iter != theFilePointers.end())

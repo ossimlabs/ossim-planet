@@ -6,8 +6,7 @@
 #include <osgUtil/IntersectVisitor>
 #include <algorithm>
 #include <ossimPlanet/ossimPlanetXmlAction.h>
-#include <OpenThreads/ScopedLock>
-
+#include <mutex>
 
 ossimPlanetAnnotationLayer::ossimPlanetAnnotationLayer()
 {
@@ -36,13 +35,13 @@ ossimPlanetAnnotationLayer::~ossimPlanetAnnotationLayer()
 
 void ossimPlanetAnnotationLayer::traverse(osg::NodeVisitor& nv)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theGraphMutex);
+   std::lock_guard<std::recursive_mutex> lock(theGraphMutex);
    switch(nv.getVisitorType())
 	{
 		case osg::NodeVisitor::UPDATE_VISITOR:
 		{
          {
-				OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theNodesToRemoveListMutex);
+				std::lock_guard<std::recursive_mutex> lock(theNodesToRemoveListMutex);
            ossimPlanetNode::NodeListType::iterator iter = theNodesToRemoveList.begin();
             while(iter != theNodesToRemoveList.end())
             {
@@ -109,7 +108,7 @@ void ossimPlanetAnnotationLayer::execute(const ossimPlanetAction& action)
 				osg::ref_ptr<ossimPlanetAnnotationLayerNode> annotationNode = dynamic_cast<ossimPlanetAnnotationLayerNode*>(layerNode.get());
             if(annotationNode.valid())
             {
-               OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theGraphMutex);
+               std::lock_guard<std::recursive_mutex> lock(theGraphMutex);
                if(!annotationNode->isStaged())
                {
                   theStagingThreadQueue->add(new ossimPlanetAnnotationLayer::Stager(annotationNode.get()));
@@ -215,7 +214,7 @@ void ossimPlanetAnnotationLayer::execute(const ossimPlanetAction& action)
 void ossimPlanetAnnotationLayer::removeByNameAndId(const ossimString& name, const ossimString& id)
 {
    ossimPlanetLayerNameIdSearchVisitor nv(name, id);
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theGraphMutex);
+   std::lock_guard<std::recursive_mutex> lock(theGraphMutex);
    accept(nv);
    ossimPlanetNode* node = dynamic_cast<ossimPlanetNode*>(nv.node().get());
    if(node)
@@ -237,7 +236,7 @@ void ossimPlanetAnnotationLayer::needsRemoving(osg::Node* node)
 	ossimPlanetNode* pNode = dynamic_cast<ossimPlanetNode*>(node);
 	if(pNode)
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theNodesToRemoveListMutex);
+		std::lock_guard<std::recursive_mutex> lock(theNodesToRemoveListMutex);
 		// keep it around for next update removal
 		theNodesToRemoveList.push_back(pNode);
 	}

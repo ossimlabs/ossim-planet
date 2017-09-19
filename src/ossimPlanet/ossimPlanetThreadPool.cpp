@@ -2,7 +2,6 @@
 #include <ossimPlanet/ossimPlanetThread.h>
 #include <algorithm>
 #include <iostream>
-#include <OpenThreads/ScopedLock>
 unsigned int ossimPlanetThreadPool::theMaxThreads = 32;
 
 osg::ref_ptr<ossimPlanetThreadPool> ossimPlanetThreadPool::theInstance = 0;
@@ -31,7 +30,7 @@ void ossimPlanetThreadPool::makeAvailable(osg::ref_ptr<ossimPlanetThread> thread
    ossimPlanetThreadImp* imp = thread->implementation();
    bool pooled = false;
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theListMutex);
+      std::lock_guard<std::recursive_mutex> lock(theListMutex);
       std::vector<osg::ref_ptr<ossimPlanetThread> >::iterator iter = std::find(theUnavailableList.begin(),
                                                                              theUnavailableList.end(),
                                                                              thread);
@@ -54,7 +53,7 @@ void ossimPlanetThreadPool::makeAvailable(osg::ref_ptr<ossimPlanetThread> thread
 osg::ref_ptr<ossimPlanetThread> ossimPlanetThreadPool::nextAvailable()
 {
    osg::ref_ptr<ossimPlanetThread> thread = NULL;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theListMutex);
    if(theAvailableList.size() < 1)
    {
       if(totalThreads() < theMaxThreads)

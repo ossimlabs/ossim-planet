@@ -153,7 +153,7 @@ void ossimPlanetActionRouter::executeNetworkActions()
 
 void ossimPlanetActionRouter::registerReceiver(ossimPlanetActionReceiver* r)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReceiverMutex);
+   std::lock_guard<std::recursive_mutex> lock(theReceiverMutex);
    if(!r) return;
 //     assert(r != NULL);
     
@@ -170,7 +170,7 @@ void ossimPlanetActionRouter::registerReceiver(ossimPlanetActionReceiver* r)
 
 void ossimPlanetActionRouter::unregisterReceiver(ossimPlanetActionReceiver* r)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReceiverMutex);
+   std::lock_guard<std::recursive_mutex> lock(theReceiverMutex);
    if(!r) return;
 //     assert(r != NULL);
 
@@ -215,7 +215,7 @@ void ossimPlanetActionRouter::unregisterReceiver(ossimPlanetActionReceiver* r)
 
 ossimPlanetActionReceiver* ossimPlanetActionRouter::receiver(const ossimString& receiverPathname) const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReceiverMutex);
+   std::lock_guard<std::recursive_mutex> lock(theReceiverMutex);
     ossimPlanetActionReceiver* result = NULL;
     MapType::const_iterator r = receivers_.find(receiverPathname);
     
@@ -353,7 +353,7 @@ ossimPlanetActionRouter::ossimPlanetActionRouter() :
 
 ossimPlanetActionRouter::~ossimPlanetActionRouter()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReceiverMutex);
+   std::lock_guard<std::recursive_mutex> lock(theReceiverMutex);
    receivers_.clear();
 	if(theThreadQueue.valid())
 	{

@@ -494,7 +494,7 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetSrtmElevationDatabase::getTexture(ossi
                                                                             ossim_uint64 col,
                                                                             const ossimPlanetGridUtility& utility)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
 
    if(!theOpenFlag)
    {

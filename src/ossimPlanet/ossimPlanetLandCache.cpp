@@ -3,7 +3,7 @@
 
 void ossimPlanetLandCacheNode::access()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theTimeStamp = osg::Timer::instance()->tick();
 }
 
@@ -15,14 +15,14 @@ void ossimPlanetLandCacheNode::protectedAccess()
 
 void ossimPlanetLandCacheNode::setExtents(osg::ref_ptr<ossimPlanetExtents> extents)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theExtents = extents.get();
 }
 
 void ossimPlanetLandCacheNode::setTexture(ossim_uint32 idx,
                                           osg::ref_ptr<ossimPlanetImage> texture)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    
    if(idx >= theTextureList.size())
    {
@@ -53,7 +53,7 @@ void ossimPlanetLandCacheNode::setTexture(ossim_uint32 idx,
 
 void ossimPlanetLandCacheNode::clearTextures()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
 
    theTextureList.clear();
    adjustSize();
@@ -62,7 +62,7 @@ void ossimPlanetLandCacheNode::clearTextures()
 
 void ossimPlanetLandCacheNode::setElevation(osg::ref_ptr<ossimPlanetImage> elevation)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theElevation = elevation.get();
    adjustSize();
 }
@@ -79,7 +79,7 @@ ossim_uint64 ossimPlanetLandCacheNode::getNodeSizeInBytes()const
 
 void ossimPlanetLandCacheNode::estimateSize()
 {
-   theNodeSizeInBytes = (sizeof(osg::Timer_t)+sizeof(OpenThreads::Mutex)+sizeof(theId)+sizeof(theNodeSizeInBytes)+
+   theNodeSizeInBytes = (sizeof(osg::Timer_t)+sizeof(std::mutex)+sizeof(theId)+sizeof(theNodeSizeInBytes)+
                          sizeof(theExtents)+sizeof(theTextureList)+sizeof(theElevation)+sizeof(theLandCache));
 
    if(theElevation.valid())
@@ -120,7 +120,7 @@ ossimPlanetLandCache::ossimPlanetLandCache(ossim_uint64 maxCacheSize, ossim_uint
 
 bool ossimPlanetLandCache::addNode(ossimPlanetLandCacheNode* node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    if(!node) return false;
    if(theMaxCacheSize < node->getNodeSizeInBytes()) return false;
       
@@ -146,7 +146,7 @@ bool ossimPlanetLandCache::addNode(ossimPlanetLandCacheNode* node)
 
 ossimPlanetLandCacheNode* ossimPlanetLandCache::getNode(ossim_uint64 id, bool allocateNewNodeIfNotPresent)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    if(theMaxCacheSize == 0) return 0;
    ossimPlanetLandCacheType::iterator iter = theCacheMap.find(id);
    if(iter != theCacheMap.end())
@@ -181,7 +181,7 @@ osg::ref_ptr<ossimPlanetLandCacheNode> ossimPlanetLandCache::removeNode(ossim_ui
 
 void ossimPlanetLandCache::setCacheSize(ossim_uint64 maxCacheSize, ossim_uint64 minCacheSize)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theMaxCacheSize = ossim::max(maxCacheSize, minCacheSize);
    theMinCacheSize = ossim::min(maxCacheSize, minCacheSize);
    protectedShrinkCache();
@@ -194,19 +194,19 @@ ossim_uint64 ossimPlanetLandCache::getCacheSize()const
 
 void ossimPlanetLandCache::shrinkCache()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    protectedShrinkCache();
 }
 void ossimPlanetLandCache::clearCache()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    theCacheMap.clear();
    theCurrentCacheSize = 0;
 }
 
 void ossimPlanetLandCache::clearAllWithinExtents(osg::ref_ptr<ossimPlanetExtents> extents)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossimPlanetLandCacheType::iterator iter = theCacheMap.begin();
 
    while(iter != theCacheMap.end())
@@ -234,7 +234,7 @@ void ossimPlanetLandCache::clearAllWithinExtents(osg::ref_ptr<ossimPlanetExtents
 
 void ossimPlanetLandCache::clearTexturesWithinExtents(osg::ref_ptr<ossimPlanetExtents> extents)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+   std::lock_guard<std::recursive_mutex> lock(theMutex);
    ossimPlanetLandCacheType::iterator iter = theCacheMap.begin();
 
    while(iter != theCacheMap.end())

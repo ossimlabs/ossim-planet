@@ -2,7 +2,6 @@
 #define ossimPlanetLand_HEADER
 #include <osg/Group>
 #include <osg/Timer>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <osgDB/DatabasePager>
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossimPlanet/ossimPlanetLayer.h>
@@ -21,6 +20,7 @@
 #include <ossimPlanet/ossimPlanetActionReceiver.h>
 #include <ossimPlanet/ossimPlanetXmlAction.h>
 #include <osg/GL2Extensions>
+#include <mutex>
 
 class ossimPlanetGeoRefModel;
 class ossimPlanetLandReaderWriter;
@@ -148,8 +148,8 @@ protected:
    
    osg::ref_ptr<ossimPlanetLandReaderWriter>    theReaderWriter;
    static ossim_uint32                          theLandReaderWriterId;
-   mutable ossimPlanetReentrantMutex                   theMutex;
-   mutable ossimPlanetReentrantMutex                   theRefreshMutex;
+   mutable std::recursive_mutex                   theMutex;
+   mutable std::recursive_mutex                   theRefreshMutex;
    osg::ref_ptr<ossimPlanetTextureLayerGroup>   theReferenceLayer;
    osg::ref_ptr<ossimPlanetTextureLayerGroup>   theOverlayLayers;
    mutable std::vector<osg::ref_ptr<refreshInfo> > theExtentRefreshList;

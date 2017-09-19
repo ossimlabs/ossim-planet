@@ -109,14 +109,14 @@ ossimPlanetViewMatrixBuilder::~ossimPlanetViewMatrixBuilder()
 
 void ossimPlanetViewMatrixBuilder::setGeoRefModel(ossimPlanetGeoRefModel* model)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theModel = model;
    setComputeViewMatrixFlag(true);
 }
 
 void ossimPlanetViewMatrixBuilder::updateFromLocalDisplacement(const osg::Vec3d& displacement)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theFromDisplacement = displacement;
    setComputeViewMatrixFlag(true);
 }
@@ -126,7 +126,7 @@ void ossimPlanetViewMatrixBuilder::setLookFromNodeOffset(osg::Node* node,
                                                          double range,
                                                          int relativeOrientationFlag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theFromInformationSetFlag = false;
    theFromNode = node;
    if(!node||!theModel.valid()) return;
@@ -157,7 +157,7 @@ void ossimPlanetViewMatrixBuilder::setLookFrom(const osg::Vec3d& llh,
                                                const osg::Vec3d& hpr,
                                                double range)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theFromNode = 0;
    theFromRange = range; // we displace along the look
    theFromPositionLLH = llh;
@@ -191,7 +191,7 @@ osg::Vec3d ossimPlanetViewMatrixBuilder::computeFromOrientation()const
 
 void ossimPlanetViewMatrixBuilder::setLookToNode(osg::Node* node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theToNode = node;
    theToInformationSetFlag = false;
    if(node)
@@ -217,7 +217,7 @@ void ossimPlanetViewMatrixBuilder::setLookToNode(osg::Node* node)
 
 void ossimPlanetViewMatrixBuilder::setLookTo(const osg::Vec3d& llh)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theToNode = 0;
    theToPositionLLH = llh;
    theToInformationSetFlag = true;
@@ -226,27 +226,27 @@ void ossimPlanetViewMatrixBuilder::setLookTo(const osg::Vec3d& llh)
 
 void ossimPlanetViewMatrixBuilder::setLookToLocalDisplacement(const osg::Vec3d& displacement)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theToDisplacement = displacement;
    setComputeViewMatrixFlag(true);
 }
 void ossimPlanetViewMatrixBuilder::setLookToRange(double range)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theToRange = range;
    setComputeViewMatrixFlag(true);
 }
 
 void ossimPlanetViewMatrixBuilder::setRange(double range)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    theRange = range;
    setComputeViewMatrixFlag(true);
 }
 
 double ossimPlanetViewMatrixBuilder::range()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    return theRange;
 }
 
@@ -273,7 +273,7 @@ bool ossimPlanetViewMatrixBuilder::extractCompositedLlhHprParameters(osg::Vec3d&
 
 void ossimPlanetViewMatrixBuilder::setParametersByMatrix(const osg::Matrixd& m)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(!theModel.valid())
    {
       // nothing to do
@@ -309,7 +309,7 @@ void ossimPlanetViewMatrixBuilder::setParametersByMatrix(const osg::Matrixd& m)
 
 void ossimPlanetViewMatrixBuilder::convertToAFromViewMatrix(bool flattenRangeFlag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(!theModel.valid())
    {
       // nothing to do
@@ -391,7 +391,7 @@ void ossimPlanetViewMatrixBuilder::convertToAFromViewMatrix(bool flattenRangeFla
 
 void ossimPlanetViewMatrixBuilder::computeMatrices()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::recursive_mutex> lock(thePropertyMutex);
    if(!theModel) return;
    // need to compute the view matrix
    if(theFromInformationSetFlag)

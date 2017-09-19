@@ -1,5 +1,4 @@
 #include <ossimPlanet/ossimPlanetTerrain.h>
-#include <OpenThreads/ScopedLock>
 #include <osg/NodeVisitor>
 #include <ossimPlanet/ossimPlanetTerrainTechnique.h>
 #include <ossim/elevation/ossimElevSourceFactory.h>
@@ -18,6 +17,7 @@
 #include <osgUtil/IncrementalCompileOperation>
 #include <stack>
 #include <set>
+#include <mutex>
 
 struct ossimPlanetDatabasePagerCompileCompletedCallback : public osgUtil::IncrementalCompileOperation::CompileCompletedCallback
 {
@@ -342,28 +342,28 @@ ossimPlanetTerrain::~ossimPlanetTerrain()
    
    if(theElevationQueue.valid())
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lockElevationQueue(theElevationQueueMutex);
+      std::lock_guard<std::recursive_mutex> lockElevationQueue(theElevationQueueMutex);
       theElevationQueue->removeAllOperations();
       theElevationQueue->cancel();
       theElevationQueue = 0;
    }
    if(theTextureQueue.valid())
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lockTextureQueue(theTextureQueueMutex);
+      std::lock_guard<std::recursive_mutex> lockTextureQueue(theTextureQueueMutex);
       theTextureQueue->removeAllOperations();
       theTextureQueue->cancel();
       theTextureQueue = 0;
    }
    if(theSplitQueue.valid())
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lockSplitQueue(theSplitQueueMutex);
+      std::lock_guard<std::recursive_mutex> lockSplitQueue(theSplitQueueMutex);
       theSplitQueue->removeAllOperations();
       theSplitQueue->cancel();
       theSplitQueue = 0;
    }
    if(theMergeQueue.valid())
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lockMergeQueue(theMergeQueueMutex);
+      std::lock_guard<std::recursive_mutex> lockMergeQueue(theMergeQueueMutex);
       theMergeQueue->removeAllOperations();
       theMergeQueue = 0;
    }
@@ -374,7 +374,7 @@ ossimPlanetTerrain::~ossimPlanetTerrain()
    
    {
       osg::Group::removeChildren(0, getNumChildren());
-      //OpenThreads::ScopedLock<OpenThreads::Mutex> lockTileSet(theTileSetMutex);
+      //std::lock_guard<std::recursive_mutex> lockTileSet(theTileSetMutex);
       theTileSet.clear();
    }
    if(theElevationCache.valid())
@@ -386,7 +386,7 @@ ossimPlanetTerrain::~ossimPlanetTerrain()
 
 void ossimPlanetTerrain::setTerrainTechnique(ossimPlanetTerrainTechnique* technique)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::mutex> lock(thePropertyMutex);
    theResetRootsFlag = true;
    theTerrainTechnique = technique;
 }
@@ -412,7 +412,7 @@ void ossimPlanetTerrain::setElevationEnabledFlag(bool flag)
 {
    bool refresh = elevationEnabledFlag()!=flag;
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       theElevationEnabledFlag = flag;
    }
    if(refresh)
@@ -424,7 +424,7 @@ void ossimPlanetTerrain::setElevationEnabledFlag(bool flag)
 
 bool ossimPlanetTerrain::elevationEnabledFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::mutex> lock(thePropertyMutex);
    return theElevationEnabledFlag;
 }
 
@@ -569,7 +569,7 @@ void ossimPlanetTerrain::traverse(osg::NodeVisitor &nv)
    // first mark any tile for refresh
    
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+      std::lock_guard<std::mutex> lock(thePropertyMutex);
       if(theElevationCache.valid()&&theElevationCache->exceedsMaxCacheSize())
       {
          if(theElevationCacheShrinkOperation->referenceCount() == 1)
@@ -630,7 +630,7 @@ void ossimPlanetTerrain::traverse(osg::NodeVisitor &nv)
                                !theElevationQueue->empty()||
                                !theSplitQueue->empty());
          {
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReadyToApplyToGraphQueueMutex);
+            std::lock_guard<std::recursive_mutex> lock(theReadyToApplyToGraphQueueMutex);
             if(!theReadyToApplyToGraphQueue.empty()||
                !theReadyToApplyToGraphNewNodesQueue.empty())
             {
@@ -638,7 +638,7 @@ void ossimPlanetTerrain::traverse(osg::NodeVisitor &nv)
             }
          }
          {
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theNeedToCompileQueueMutex);
+            std::lock_guard<std::recursive_mutex> lock(theNeedToCompileQueueMutex);
             if(!theNeedToCompileQueue.empty())
             {
                needToRedraw = true;
@@ -694,7 +694,7 @@ t.theCullCount << std::endl;
 
 void ossimPlanetTerrain::setGrid(ossimPlanetGrid* grid)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::mutex> lock(thePropertyMutex);
    
    theResetRootsFlag = true;
    theGrid = grid;
@@ -702,13 +702,13 @@ void ossimPlanetTerrain::setGrid(ossimPlanetGrid* grid)
 
 const ossimPlanetGrid* ossimPlanetTerrain::grid()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::mutex> lock(thePropertyMutex);
    return theGrid.get();
 }
 
 ossimPlanetGrid* ossimPlanetTerrain::grid()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::mutex> lock(thePropertyMutex);
    return theGrid.get();
 }
 
@@ -838,7 +838,7 @@ void ossimPlanetTerrain::requestElevation(ossimPlanetTerrainTile* tile,
 
 void ossimPlanetTerrain::compileGLObjects(osg::State& state, double compileTime)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theNeedToCompileQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock(theNeedToCompileQueueMutex);
    osg::Timer_t startT = osg::Timer::instance()->tick();
    double delta = 0.0;
    double deltaNextTest = 0.0;
@@ -872,7 +872,7 @@ void ossimPlanetTerrain::compileGLObjects(osg::State& state, double compileTime)
 
 bool ossimPlanetTerrain::resetRootsFlag()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::mutex> lock(thePropertyMutex);
    return theResetRootsFlag;
 }
 
@@ -888,7 +888,7 @@ void ossimPlanetTerrain::buildRoot()
    theTextureQueue->removeAllOperations();
    bool hasActiveOperations = false;
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTileSetMutex);
+      std::lock_guard<std::recursive_mutex> lock(theTileSetMutex);
       TileSet::iterator iter = theTileSet.begin();
       while(iter != theTileSet.end())
       {
@@ -954,7 +954,7 @@ double ossimPlanetTerrain::maxTimeToMerge()const
 void ossimPlanetTerrain::registerTile(ossimPlanetTerrainTile* tile)
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTileSetMutex);
+      std::lock_guard<std::recursive_mutex> lock(theTileSetMutex);
       if(tile)
       {
          theTileSet.insert(tile);
@@ -965,7 +965,7 @@ void ossimPlanetTerrain::registerTile(ossimPlanetTerrainTile* tile)
 void ossimPlanetTerrain::unregisterTile(ossimPlanetTerrainTile* tile)
 {
    {   
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTileSetMutex);
+      std::lock_guard<std::recursive_mutex> lock(theTileSetMutex);
       TileSet::iterator iter = theTileSet.find(tile);
       if(iter != theTileSet.end())
       {
@@ -976,7 +976,7 @@ void ossimPlanetTerrain::unregisterTile(ossimPlanetTerrainTile* tile)
 ossimPlanetTerrainTile* ossimPlanetTerrain::findTile(const ossimPlanetTerrainTileId& id)
 {
 #if 0
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTileSetMapMutex);
+   std::lock_guard<std::recursive_mutex> lock(theTileSetMapMutex);
    TileSetMap::iterator iter = theTileSetMap.find(id);
    if(iter != theTileSetMap.end())
    {
@@ -988,7 +988,7 @@ ossimPlanetTerrainTile* ossimPlanetTerrain::findTile(const ossimPlanetTerrainTil
 const ossimPlanetTerrainTile* ossimPlanetTerrain::findTile(const ossimPlanetTerrainTileId& id)const
 {
 #if 0
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTileSetMapMutex);
+   std::lock_guard<std::recursive_mutex> lock(theTileSetMapMutex);
    TileSetMap::const_iterator iter = theTileSetMap.find(id);
    if(iter != theTileSetMap.end())
    {
@@ -1003,7 +1003,7 @@ void ossimPlanetTerrain::refreshImageAndElevationLayers(ossimPlanetExtents* exte
    refreshImageLayers(extents);
    refreshElevationLayers(extents);
 #if 0
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTileSetMutex);
+   std::lock_guard<std::recursive_mutex> lock(theTileSetMutex);
    TileSet::iterator iter = theTileSet.begin();
    bool imageIntersects     = true;
    bool elevationIntersects = true;
@@ -1073,7 +1073,7 @@ void ossimPlanetTerrain::refreshImageAndElevationLayers(ossimPlanetExtents* exte
 
 void ossimPlanetTerrain::refreshImageLayers(ossimPlanetExtents* extents)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRefreshExtentsMutex);
+   std::lock_guard<std::recursive_mutex> lock(theRefreshExtentsMutex);
    if(theRefreshImageExtent.valid())
    {
       if(extents)
@@ -1094,7 +1094,7 @@ void ossimPlanetTerrain::refreshImageLayers(ossimPlanetExtents* extents)
 
 void ossimPlanetTerrain::refreshElevationLayers(ossimPlanetExtents* extents)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRefreshExtentsMutex);
+   std::lock_guard<std::recursive_mutex> lock(theRefreshExtentsMutex);
    if(theRefreshElevationExtent.valid())
    {
       if(extents)
@@ -1117,8 +1117,8 @@ void ossimPlanetTerrain::refreshElevationLayers(ossimPlanetExtents* extents)
 void ossimPlanetTerrain::refreshExtents()
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theRefreshExtentsMutex);
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock2(theTileSetMutex);
+      std::lock_guard<std::recursive_mutex> lock(theRefreshExtentsMutex);
+      std::lock_guard<std::recursive_mutex> lock2(theTileSetMutex);
       if(!theRefreshElevationExtent.valid()&&
          !theRefreshImageExtent.valid())
       {
@@ -1188,7 +1188,7 @@ void ossimPlanetTerrain::refreshExtents()
 
 void ossimPlanetTerrain::resetImageLayers()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theTileSetMutex);
+   std::lock_guard<std::recursive_mutex> lock(theTileSetMutex);
    TileSet::iterator iter = theTileSet.begin();
    while(iter != theTileSet.end())
    {
@@ -1205,7 +1205,7 @@ void ossimPlanetTerrain::resetImageLayers()
 
 void ossimPlanetTerrain::resetGraph()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePropertyMutex);
+   std::lock_guard<std::mutex> lock(thePropertyMutex);
    theResetRootsFlag = true;
 }
 
@@ -1220,7 +1220,7 @@ void ossimPlanetTerrain::setModel(ossimPlanetGeoRefModel* model)
 
 void ossimPlanetTerrain::addRequestToReadyToApplyQueue(ossimPlanetTileRequest* request)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReadyToApplyToGraphQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock(theReadyToApplyToGraphQueueMutex);
    if(dynamic_cast<ossimPlanetSplitRequest*>(request))
    {
       theReadyToApplyToGraphNewNodesQueue.push_back(request);
@@ -1258,7 +1258,7 @@ void ossimPlanetTerrain::addRequestToNeedToCompileQueue(ossimPlanetTileRequest* 
 
 void ossimPlanetTerrain::applyRequestsToGraph(double maxTime)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReadyToApplyToGraphQueueMutex);
+   std::lock_guard<std::recursive_mutex> lock(theReadyToApplyToGraphQueueMutex);
    if(theReadyToApplyToGraphQueue.empty()&&theReadyToApplyToGraphNewNodesQueue.empty()) return;
    osg::ref_ptr<ossimPlanetTileRequest> request;
    bool doneFlag = false;
@@ -1314,7 +1314,7 @@ void ossimPlanetTerrain::applyRequestsToGraph(double maxTime)
 void ossimPlanetTerrain::pruneNeedToCompileAndAddToGraphThreadQueues()
 {
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReadyToApplyToGraphQueueMutex);
+      std::lock_guard<std::recursive_mutex> lock(theReadyToApplyToGraphQueueMutex);
       ossimPlanetTileRequest::List::iterator iter = theReadyToApplyToGraphQueue.begin();
       while(iter != theReadyToApplyToGraphQueue.end())
       {
@@ -1332,7 +1332,7 @@ void ossimPlanetTerrain::pruneNeedToCompileAndAddToGraphThreadQueues()
 #if 1
    {
       
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theReadyToApplyToGraphQueueMutex);
+      std::lock_guard<std::recursive_mutex> lock(theReadyToApplyToGraphQueueMutex);
       ossimPlanetTileRequest::List::iterator iter = theReadyToApplyToGraphNewNodesQueue.begin();
       while(iter != theReadyToApplyToGraphNewNodesQueue.end())
       {
@@ -1349,7 +1349,7 @@ void ossimPlanetTerrain::pruneNeedToCompileAndAddToGraphThreadQueues()
    }
 #endif
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theNeedToCompileQueueMutex);
+      std::lock_guard<std::recursive_mutex> lock(theNeedToCompileQueueMutex);
       ossimPlanetTileRequest::List::iterator iter = theNeedToCompileQueue.begin();
       while(iter != theNeedToCompileQueue.end())
       {
@@ -1368,7 +1368,7 @@ void ossimPlanetTerrain::pruneNeedToCompileAndAddToGraphThreadQueues()
 
 void ossimPlanetTerrain::removeTerrainChildren(double maxTime)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theChildrenToRemoveMutex);
+   std::lock_guard<std::recursive_mutex> lock(theChildrenToRemoveMutex);
    osg::Timer_t startTick = osg::Timer::instance()->tick();
    //   osgUtil::GLObjectsVisitor visitor(osgUtil::GLObjectsVisitor::RELEASE_DISPLAY_LISTS|
    //                                     osgUtil::GLObjectsVisitor::RELEASE_STATE_ATTRIBUTES);

@@ -2,9 +2,8 @@
 #define ossimPlanetCallback_HEADER
 #include <osg/Referenced>
 #include <osg/ref_ptr>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossimPlanet/ossimPlanetExport.h>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 #include <vector>
 class  OSSIMPLANET_DLL ossimPlanetCallback : public osg::Referenced
 {
@@ -14,16 +13,16 @@ public:
    {}
    void setEnableFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackMutex);
+      std::lock_guard<std::recursive_mutex> lock(theCallbackMutex);
       theEnableFlag = flag;
    }
    bool enableFlag()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackMutex);
+      std::lock_guard<std::recursive_mutex> lock(theCallbackMutex);
       return theEnableFlag;
    }
 protected:
-   mutable ossimPlanetReentrantMutex theCallbackMutex;
+   mutable std::recursive_mutex theCallbackMutex;
    bool theEnableFlag;
 };
 
@@ -40,7 +39,7 @@ class ossimPlanetCallbackListInterface
       virtual ~ ossimPlanetCallbackListInterface(){}
       virtual void addCallback(T* callback)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+         std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
          if(!hasCallbackNoMutex(callback))
          {
             theCallbackList.push_back(callback);
@@ -57,14 +56,14 @@ class ossimPlanetCallbackListInterface
 		}
       virtual void blockCallbacks(bool flag)
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+         std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
          theBlockCallbacksFlag = flag;
       }
       bool hasCallback(const T* callback)const;
    protected:
       bool hasCallbackNoMutex(const T* callback)const;
       
-      mutable ossimPlanetReentrantMutex theCallbackListMutex;
+      mutable std::recursive_mutex theCallbackListMutex;
       CallbackListType theCallbackList;
       bool theBlockCallbacksFlag;
       
@@ -72,7 +71,7 @@ class ossimPlanetCallbackListInterface
 template <class T>
 void ossimPlanetCallbackListInterface<T>::removeCallback(T* callback)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    unsigned int idx;
    for(idx = 0; idx < theCallbackList.size(); ++idx)
    {
@@ -87,7 +86,7 @@ void ossimPlanetCallbackListInterface<T>::removeCallback(T* callback)
 template <class T>
 bool ossimPlanetCallbackListInterface<T>::hasCallback(const T* callback)const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    return hasCallbackNoMutex(callback);
 }
 

@@ -189,7 +189,7 @@ void ossimPlanetNode::setRedrawFlag(bool flag)//(bool flag, bool passToParentFla
 {
    bool changed = false;
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(thePlanetNodeRedrawPropertyMutex);
+      std::lock_guard<std::recursive_mutex> lock(thePlanetNodeRedrawPropertyMutex);
       changed = (theRedrawFlag != flag);
       theRedrawFlag = flag;
    }
@@ -269,7 +269,7 @@ ossimPlanetNode* ossimPlanetNode::findNode(osg::NodePath& currentNodePath)
 
 void ossimPlanetNode::notifyPropertyChanged(ossimPlanetNode* node, const ossimString& name)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx = 0;
    ossim_uint32 upper = theCallbackList.size();
@@ -285,7 +285,7 @@ void ossimPlanetNode::notifyPropertyChanged(ossimPlanetNode* node, const ossimSt
 
 void ossimPlanetNode::notifyDestructing(ossimPlanetNode* node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx = 0;
    ossim_uint32 upper = theCallbackList.size();
@@ -301,7 +301,7 @@ void ossimPlanetNode::notifyDestructing(ossimPlanetNode* node)
 
 void ossimPlanetNode::notifyNeedsRedraw()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx = 0;
    ossim_uint32 upper = theCallbackList.size();
@@ -317,7 +317,7 @@ void ossimPlanetNode::notifyNeedsRedraw()
 
 void ossimPlanetNode::notifyAddChild(osg::ref_ptr<osg::Node> node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    
    ossim_uint32 idx = 0;
@@ -334,7 +334,7 @@ void ossimPlanetNode::notifyAddChild(osg::ref_ptr<osg::Node> node)
 
 void ossimPlanetNode::notifyRemoveChild(osg::ref_ptr<osg::Node> node)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    
    ossim_uint32 idx = 0;

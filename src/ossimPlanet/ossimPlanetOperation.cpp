@@ -7,7 +7,7 @@ const ossimPlanetOperation::Priority ossimPlanetOperation::PRIORITY_LOWEST = 0.0
 osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperation::nextDependency(bool recurseFlag)
 {
    osg::ref_ptr<ossimPlanetOperation> result;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theDependencyListMutex);
+   std::lock_guard<std::mutex> lock(theDependencyListMutex);
    if(!recurseFlag)
    {
       if(theDependencyList.size()>0)
@@ -40,7 +40,7 @@ osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperation::nextDependency(bool rec
 
 void ossimPlanetOperation::notifyReady()
 {	
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -53,7 +53,7 @@ void ossimPlanetOperation::notifyReady()
 }
 void ossimPlanetOperation::notifyStarted()
 {	
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -67,7 +67,7 @@ void ossimPlanetOperation::notifyStarted()
 
 void ossimPlanetOperation::notifyFinished()
 {	
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -82,7 +82,7 @@ void ossimPlanetOperation::notifyFinished()
 
 void ossimPlanetOperation::notifyCanceled()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -96,7 +96,7 @@ void ossimPlanetOperation::notifyCanceled()
 
 void ossimPlanetOperation::notifyPriorityChanged()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -110,7 +110,7 @@ void ossimPlanetOperation::notifyPriorityChanged()
 
 void ossimPlanetOperation::notifyPropertyChanged(const ossimString& name)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theCallbackListMutex);
+   std::lock_guard<std::recursive_mutex> lock(theCallbackListMutex);
    if(theBlockCallbacksFlag) return;
    ossim_uint32 idx;
    for(idx =0; idx < theCallbackList.size(); ++idx)
@@ -134,7 +134,7 @@ ossimPlanetOperationQueue::~ossimPlanetOperationQueue()
 
 void ossimPlanetOperationQueue::add(ossimPlanetOperation* operation, bool guaranteeUniqueFlag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+   std::lock_guard<std::mutex> lock(theOperationQueueMutex);
    
    if(guaranteeUniqueFlag)
    {
@@ -151,7 +151,7 @@ void ossimPlanetOperationQueue::add(ossimPlanetOperation* operation, bool guaran
 
 void ossimPlanetOperationQueue::removeStoppedOperations()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+   std::lock_guard<std::mutex> lock(theOperationQueueMutex);
    ossimPlanetOperation::List::iterator iter = theOperationQueue.begin();
    while(iter!=theOperationQueue.end())
    {
@@ -170,7 +170,7 @@ osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationQueue::removeById(const o
 {   
    osg::ref_ptr<ossimPlanetOperation> result;
    if(id.empty()) return result;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+   std::lock_guard<std::mutex> lock(theOperationQueueMutex);
    ossimPlanetOperation::List::iterator iter = findById(id);
    if(iter!=theOperationQueue.end())
    {
@@ -187,7 +187,7 @@ osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationQueue::removeByName(const
 {   
    osg::ref_ptr<ossimPlanetOperation> result;
    if(name.empty()) return result;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+   std::lock_guard<std::mutex> lock(theOperationQueueMutex);
    ossimPlanetOperation::List::iterator iter = findByName(name);
    if(iter!=theOperationQueue.end())
    {
@@ -202,7 +202,7 @@ osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationQueue::removeByName(const
 
 void ossimPlanetOperationQueue::remove(const ossimPlanetOperation* operation)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+   std::lock_guard<std::mutex> lock(theOperationQueueMutex);
    ossimPlanetOperation::List::iterator iter = findByPointer(operation);
    if(iter!=theOperationQueue.end())
    {
@@ -214,7 +214,7 @@ void ossimPlanetOperationQueue::remove(const ossimPlanetOperation* operation)
 
 void ossimPlanetOperationQueue::removeAllOperations()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+   std::lock_guard<std::mutex> lock(theOperationQueueMutex);
    theOperationQueue.clear();
    theBlock->set(false);
 }
@@ -228,7 +228,7 @@ osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationQueue::nextOperation(bool
       theBlock->block();
    }
    osg::ref_ptr<ossimPlanetOperation> result;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+   std::lock_guard<std::mutex> lock(theOperationQueueMutex);
    
    if (theOperationQueue.empty())
    {
@@ -332,7 +332,7 @@ void ossimPlanetOperationQueue::releaseOperationsBlock()
 
 bool ossimPlanetOperationQueue::empty()const
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+   std::lock_guard<std::mutex> lock(theOperationQueueMutex);
    return theOperationQueue.empty();
 }
 
@@ -359,7 +359,7 @@ osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationPriorityQueue::nextOperat
 {
    // we will sort the queue and let the base pop the first element and process
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theOperationQueueMutex);
+      std::lock_guard<std::mutex> lock(theOperationQueueMutex);
       
       theOperationQueue.sort(SortRequestFunctor());
    }
@@ -385,7 +385,7 @@ ossimPlanetOperationThreadQueue::~ossimPlanetOperationThreadQueue()
 
 void ossimPlanetOperationThreadQueue::setOperationQueue(ossimPlanetOperationQueue* opq)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+   std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
    
    if (theOperationQueue == opq) return;
    
@@ -401,7 +401,7 @@ void ossimPlanetOperationThreadQueue::setDone(bool done)
    if(theDoneFlag)
    {
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+         std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
          if (theCurrentOperation.valid())
          {
             theCurrentOperation->release();
@@ -425,7 +425,7 @@ int ossimPlanetOperationThreadQueue::cancel()
       theDoneFlag = true;
       
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+         std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
 			if (theCurrentOperation.valid())
 			{
 				theCurrentOperation->cancel();
@@ -445,7 +445,7 @@ int ossimPlanetOperationThreadQueue::cancel()
          
 #if 1
          {
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+            std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
             
             if (theOperationQueue.valid()) 
             {
@@ -465,7 +465,7 @@ int ossimPlanetOperationThreadQueue::cancel()
 
 void ossimPlanetOperationThreadQueue::add(ossimPlanetOperation* operation, bool guaranteeUniqueFlag)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+   std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
    osg::ref_ptr<ossimPlanetOperation> op = operation;
    if (!theOperationQueue) return;
    theOperationQueue->add(op.get(), guaranteeUniqueFlag);
@@ -481,13 +481,13 @@ void ossimPlanetOperationThreadQueue::add(ossimPlanetOperation* operation, bool 
 
 void ossimPlanetOperationThreadQueue::remove(ossimPlanetOperation* operation)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+   std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
    if (theOperationQueue.valid()) theOperationQueue->remove(operation);
 }
 
 osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationThreadQueue::removeByName(const ossimString& name)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+   std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
    if (theOperationQueue.valid()) return theOperationQueue->removeByName(name);
    
    return 0;
@@ -495,7 +495,7 @@ osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationThreadQueue::removeByName
 
 osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationThreadQueue::removeById(const ossimString& id)
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+   std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
    if (theOperationQueue.valid()) return theOperationQueue->removeById(id);
    
    return 0;
@@ -503,7 +503,7 @@ osg::ref_ptr<ossimPlanetOperation> ossimPlanetOperationThreadQueue::removeById(c
 
 void ossimPlanetOperationThreadQueue::removeAllOperations()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+   std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
    if (theOperationQueue.valid()) 
 	{
 		theOperationQueue->removeAllOperations();
@@ -512,7 +512,7 @@ void ossimPlanetOperationThreadQueue::removeAllOperations()
 
 void ossimPlanetOperationThreadQueue::cancelCurrentOperation()
 {
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+   std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
 	if(theCurrentOperation.valid())
 	{
 		theCurrentOperation->cancel();
@@ -530,7 +530,7 @@ void ossimPlanetOperationThreadQueue::run()
       osg::ref_ptr<ossimPlanetOperationQueue> queue;
       
       {
-         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+         std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
          queue = theOperationQueue;
       }
       
@@ -541,7 +541,7 @@ void ossimPlanetOperationThreadQueue::run()
       if (operation.valid())
       {
          {
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+            std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
             theCurrentOperation = operation;
          }
          
@@ -558,7 +558,7 @@ void ossimPlanetOperationThreadQueue::run()
 				operation->start();
 			}
          {            
-            OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+            std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
             theCurrentOperation = 0;
          }
       }
@@ -643,7 +643,7 @@ void ossimPlanetOperationMultiThreadQueue::removeAllOperations()
 
 void ossimPlanetOperationMultiThreadQueue::cancelCurrentOperation()
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theThreadMutex);
+	std::lock_guard<std::recursive_mutex> lock(theThreadMutex);
 	ossim_uint32 idx = 0;
 	for(idx = 0; idx < theThreadQueueList.size();++idx)
 	{

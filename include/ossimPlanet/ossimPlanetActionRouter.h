@@ -3,19 +3,18 @@
 
 // central router for routing Actions to all registered ActionRecievers
 
-#include <assert.h>
-#include <vector>
-#include <map>
-#include <queue>
 #include "ossimPlanetActionReceiver.h"
 #include "ossimPlanetNetworkConnection.h"
 #include "ossimPlanetExport.h"
 #include "ossimPlanetRefBlock.h"
 #include <osg/Referenced>
 #include <osg/ref_ptr>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
-#include <OpenThreads/ScopedLock>
 #include <OpenThreads/Block>
+#include <assert.h>
+#include <vector>
+#include <map>
+#include <queue>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetActionRouterThreadQueue : virtual public osg::Referenced,
                                                            public OpenThreads::Thread
@@ -78,7 +77,7 @@ public:
    }
    void updateThreadBlock()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theActionQueueMutex);
+      std::lock_guard<std::recursive_mutex> lock(theActionQueueMutex);
       theBlock->set(!theActionQueue.empty());
    }
    void setDoneFlag(bool flag)
@@ -95,7 +94,7 @@ public:
 protected:
    bool     theDoneFlag;
    osg::ref_ptr<ossimPlanetRefBlock> theBlock;
-   mutable ossimPlanetReentrantMutex    theActionQueueMutex;
+   mutable std::recursive_mutex    theActionQueueMutex;
    std::queue<osg::ref_ptr<ossimPlanetAction> > theActionQueue;
 };
 
@@ -200,7 +199,7 @@ protected:
     static ossimPlanetActionRouter* instance_;
     osg::ref_ptr<ossimPlanetActionRouterThreadQueue> theThreadQueue;
     // our singleton instance
-    mutable ossimPlanetReentrantMutex theReceiverMutex;
+    mutable std::recursive_mutex theReceiverMutex;
    MapType receivers_;
     std::vector<ossimPlanetNetworkConnection*> network_;
 	// receiver name/object pairs

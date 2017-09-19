@@ -7,10 +7,11 @@
 #include <osg/LineWidth>
 #include <osg/Projection>
 #include <osg/CameraNode>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
 #include <ossim/base/ossimString.h>
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossimPlanet/ossimPlanetCompass.h>
+#include <mutex>
+
 class ossimPlanet;
 namespace osg
 {
@@ -78,7 +79,7 @@ protected:
    
    
    bool theInitializedFlag;
-   mutable OpenThreads::ReentrantMutex theMutex;
+   mutable std::recursive_mutex theMutex;
    bool theViewportChangedFlag;
    osg::ref_ptr<ossimPlanetCompass> theCompass;
 };

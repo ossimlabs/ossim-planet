@@ -57,20 +57,20 @@ protected:
    void delayedExecute(const ossimPlanetAction &a);
    void delayedXmlExecute(const ossimPlanetXmlAction &a);
    
-   mutable ossimPlanetReentrantMutex thePropertyMutex;
-   mutable ossimPlanetReentrantMutex theIoListMutex;
+   mutable std::recursive_mutex thePropertyMutex;
+   mutable std::recursive_mutex theIoListMutex;
    std::vector<osg::ref_ptr<ossimPlanetIo> > theIoList;
-   mutable ossimPlanetReentrantMutex theMessageHandlerListMutex;
+   mutable std::recursive_mutex theMessageHandlerListMutex;
    ossimPlanetIoThread::MessageHandlerListType theMessageHandlerList;
    bool theDoneFlag;
    bool theStartedFlag;
    
    bool theStartCalledFlag;
    bool thePauseFlag;
-   mutable ossimPlanetReentrantMutex theDelayedExecutionMutex;
+   mutable std::recursive_mutex theDelayedExecutionMutex;
    std::queue<osg::ref_ptr<ossimPlanetAction> > theDelayedExecution;
    
-   ossimPlanetReentrantMutex theLoopMutex;
+   mutable std::recursive_mutex theLoopMutex;
 };
 
 #endif

@@ -15,7 +15,7 @@ ossimPlanetArchive::~ossimPlanetArchive()
 
 void ossimPlanetArchive::addMapping(ossimPlanetArchiveMapping &mapping)
 {
-	OpenThreads::ScopedLock<ossimPlanetReentrantMutex> lock(theArchiveMutex);
+	std::lock_guard<std::recursive_mutex> lock(theArchiveMutex);
 
 	// test to see if the mapping has an ending slash... if not add one
 	ossimFilename src = mapping.getSource();
@@ -55,7 +55,7 @@ ossimFilename ossimPlanetArchive::convertToDirectory(ossimFilename &filename)
 
 void ossimPlanetArchive::removeMapping(ossimPlanetArchiveMapping &mapping)
 {
-	OpenThreads::ScopedLock<ossimPlanetReentrantMutex> lock(theArchiveMutex);
+	std::lock_guard<std::recursive_mutex> lock(theArchiveMutex);
 	ossim_uint32 row = 0;
 	for( row = 0; row < mappingList.size(); row++ )
 	{		
@@ -74,7 +74,7 @@ void ossimPlanetArchive::removeMapping(ossimPlanetArchiveMapping &mapping)
 
 ossimFilename ossimPlanetArchive::matchPath(const ossimFilename &filename)
 {
-	OpenThreads::ScopedLock<ossimPlanetReentrantMutex> lock(theArchiveMutex);
+	std::lock_guard<std::recursive_mutex> lock(theArchiveMutex);
 	std::vector<ossimPlanetArchiveMapping>::iterator it;
 
 	if( mappingList.empty() || filename.exists() )
@@ -184,7 +184,7 @@ ossimFilename ossimPlanetArchive::matchPath(const ossimFilename &filename)
 
 void ossimPlanetArchive::setArchiveMappingEnabledFlag(bool enabled)
 {
-	OpenThreads::ScopedLock<ossimPlanetReentrantMutex> lock(theArchiveMutex);
+	std::lock_guard<std::recursive_mutex> lock(theArchiveMutex);
 	useArchiveMapping = enabled;
 }
 

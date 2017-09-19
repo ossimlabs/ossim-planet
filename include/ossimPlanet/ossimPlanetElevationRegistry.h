@@ -3,7 +3,7 @@
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossimPlanet/ossimPlanetElevationDatabase.h>
 #include <osg/Referenced>
-#include <ossimPlanet/ossimPlanetReentrantMutex.h>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetElevationRegistry
 {
@@ -29,7 +29,7 @@ public:
    static ossimPlanetElevationRegistry* instance();
    
 protected:
-   ossimPlanetReentrantMutex theMutex;
+   std::recursive_mutex theMutex;
    FactoryList theFactoryList;
 };
 

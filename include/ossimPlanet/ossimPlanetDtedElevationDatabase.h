@@ -4,7 +4,7 @@
 #include <ossim/elevation/ossimDtedHandler.h>
 #include <osg/Timer>
 #include <ossimPlanet/ossimPlanetExport.h>
-#include <OpenThreads/ReentrantMutex>
+#include <mutex>
 
 class OSSIMPLANET_DLL ossimPlanetDtedElevationDatabase : public ossimPlanetElevationDatabase
 {
@@ -63,7 +63,7 @@ protected:
    DtedFilePointerList                    theFilePointers;
    ossim_float32                          theNullHeightValue;
    bool                                   theSwapBytesFlag;
-   mutable OpenThreads::ReentrantMutex    theDtedInfoMutex;
+   mutable std::recursive_mutex           theDtedInfoMutex;
 
 };
 inline ossim_sint16 ossimPlanetDtedElevationDatabase::convertSignedMagnitude(ossim_uint16& s) const

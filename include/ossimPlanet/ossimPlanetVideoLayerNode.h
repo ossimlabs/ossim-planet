@@ -39,33 +39,33 @@ public:
    virtual ossim_float64 referenceTime()const=0;
    virtual ossimPlanetVideoLayerNode::RenderMode renderMode()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theVideoLayerNodeMutex);
+      std::lock_guard<std::recursive_mutex> lock(theVideoLayerNodeMutex);
       return theRenderMode;
    }
    virtual void setRenderMode(ossimPlanetVideoLayerNode::RenderMode mode)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theVideoLayerNodeMutex);
+      std::lock_guard<std::recursive_mutex> lock(theVideoLayerNodeMutex);
       theRenderMode = mode;
    }
    
    void setVideoLayer(ossimPlanetVideoLayer* layer)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theVideoLayerNodeMutex);
+      std::lock_guard<std::recursive_mutex> lock(theVideoLayerNodeMutex);
       theLayer = layer;
    }
    ossimPlanetVideoLayer* videoLayer()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theVideoLayerNodeMutex);
+      std::lock_guard<std::recursive_mutex> lock(theVideoLayerNodeMutex);
       return theLayer;
    }
    const ossimPlanetVideoLayer* videoLayer()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theVideoLayerNodeMutex);
+      std::lock_guard<std::recursive_mutex> lock(theVideoLayerNodeMutex);
       return theLayer;
    }
 	
 protected:
-   mutable ossimPlanetReentrantMutex   theVideoLayerNodeMutex;
+   mutable std::recursive_mutex   theVideoLayerNodeMutex;
    ossimPlanetVideoLayer*                theLayer;
    ossimPlanetVideoLayerNode::RenderMode theRenderMode;
 };
