@@ -3,6 +3,8 @@
 #include <osgUtil/CullVisitor>
 #include <osgGA/EventVisitor>
 #include <osgGA/GUIActionAdapter>
+#include <osgGA/GUIEventAdapter>
+
 #include <ossimPlanet/ossimPlanetVisitors.h>
 #include <ossimPlanet/ossimPlanet.h>
 #include <ossimPlanet/ossimPlanetLand.h>
@@ -531,10 +533,10 @@ ossimPlanetPredatorVideoLayerNode::ossimPlanetPredatorVideoLayerNode(ossimPlanet
    setUpdateCallback(new ossimPlanetPredatorVideoLayerNodeTraverseCallback);
    setEventCallback(new ossimPlanetPredatorVideoLayerNodeTraverseCallback);
    setCullCallback(new ossimPlanetPredatorVideoLayerNodeTraverseCallback);
-   theCameraNode = new osg::CameraNode;
+   theCameraNode = new osg::Camera;
    theSwitchNode = new osg::Switch;
    theIcon = new ossimPlanetIconGeom;
-   theCameraNode = new osg::CameraNode;
+   theCameraNode = new osg::Camera;
    theSharedGeode = new osg::Geode;
    theCullFlag = false;
    //    theIcon->setGeometry(osg::Vec3d(0.0,0.0,0.0),
@@ -546,7 +548,7 @@ ossimPlanetPredatorVideoLayerNode::ossimPlanetPredatorVideoLayerNode(ossimPlanet
    theCameraNode->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
    theCameraNode->setViewMatrix(osg::Matrix::identity());
    theCameraNode->setClearMask(GL_DEPTH_BUFFER_BIT);
-   theCameraNode->setRenderOrder(osg::CameraNode::POST_RENDER);
+   theCameraNode->setRenderOrder(osg::Camera::POST_RENDER);
    osg::StateSet* stateset = theCameraNode->getOrCreateStateSet();
    stateset->setMode(GL_LIGHTING,
                      osg::StateAttribute::OFF);
@@ -899,11 +901,13 @@ void ossimPlanetPredatorVideoLayerNode::traverse(osg::NodeVisitor& nv)
          osgGA::EventVisitor* ev = dynamic_cast<osgGA::EventVisitor*>(&nv);
          if(ev)
          {
-            const osgGA::EventVisitor::EventList& eventList = ev->getEvents();
-            osgGA::EventVisitor::EventList::const_iterator iter = eventList.begin();
+            const osgGA::EventQueue::Events& eventList = ev->getEvents();
+            osgGA::EventQueue::Events::const_iterator iter = eventList.begin();
             if(eventList.size())
             {
-               if(((*iter)->getEventType() == osgGA::GUIEventAdapter::FRAME))
+               const osgGA::GUIEventAdapter* guiEvent = dynamic_cast<const osgGA::GUIEventAdapter*>(iter->get());
+               if(guiEvent&&
+                  (guiEvent->getEventType() == osgGA::GUIEventAdapter::FRAME))
                {
                   if(ev->getActionAdapter())
                   {

@@ -214,14 +214,14 @@ void ossimPlanetLatLonHud::initialize()
    theGeode->addDrawable(theRangeText.get());
    theGeode->addDrawable(theCrosshair.get());
 
-   theCameraNode = new osg::CameraNode;
+   theCameraNode = new osg::Camera;
    
 //    osg::MatrixTransform* modelview_abs = new osg::MatrixTransform;
    theCameraNode->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
    theCameraNode->setProjectionMatrix(osg::Matrix::ortho2D(0,1024,0,1024));
    theCameraNode->setViewMatrix(osg::Matrix::identity());
    theCameraNode->setClearMask(GL_DEPTH_BUFFER_BIT);
-   theCameraNode->setRenderOrder(osg::CameraNode::POST_RENDER);
+   theCameraNode->setRenderOrder(osg::Camera::POST_RENDER);
    theCameraNode->addChild(theGeode.get());
    
 //    theProjection = new osg::Projection;
@@ -334,12 +334,12 @@ void ossimPlanetLatLonHud::updatePosition()
 //   bb = osg::BoundingBox();
    osg::Vec3d pos = osg::Vec3d(x, y+5, 0.0);
 //   bb.expandBy(theRangeText->getBound());
-   bb = theRangeText->getBound();
+   bb = theRangeText->getBoundingBox();
    theRangeText->setPosition(pos);
    int height = (int)(bb.yMax() - bb.yMin()) + 5;
    pos += osg::Vec3d(0.0,(height), 0.0);
    theLookText->setPosition(pos);
-   bb = theLookText->getBound();
+   bb = theLookText->getBoundingBox();
 //   bb.expandBy(theLookText->getBound());
    height = (int)(bb.yMax() - bb.yMin()) + 5;
    pos += osg::Vec3d(0.0,(height), 0.0);

@@ -505,7 +505,7 @@ bool ossimPlanetKmlPlacemarkNode::init()
             {               
                text->setUpdateCallback(new ossimPlanetKmlTextShiftUpdate(billboardIcon.get(),
                                                                          textCull.get(),
-                                                                         text->getUpdateCallback()));
+                                                                         dynamic_cast<osg::Drawable::UpdateCallback*> (text->getUpdateCallback())));
             }
          }
          if(textGeometry.valid())

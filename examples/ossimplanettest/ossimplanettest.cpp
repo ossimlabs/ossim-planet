@@ -10,7 +10,7 @@
 #include <osgDB/ReadFile>
 #include <osgGA/GUIEventHandler>
 #include <osg/Camera>
-#include <osg/CameraNode>
+#include <osg/Camera>
 #include <osg/MatrixTransform>
 #include <osg/Geode>
 #include <osgText/Text>
@@ -238,7 +238,7 @@ protected:
 			updateText();
 		}
 	}
-	osg::ref_ptr<osg::CameraNode> theHudCamera;
+	osg::ref_ptr<osg::Camera> theHudCamera;
 	osg::ref_ptr<osgText::Text> theHudText;
 	std::string theFontName;
 	osg::ref_ptr<osgText::Font> theFont;
@@ -1593,7 +1593,7 @@ void TestHandler::initScene(ossimPlanetViewer* viewer)
 	stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 	stateset->setAttribute(new osg::PolygonMode(), 
                           osg::StateAttribute::PROTECTED); // don't allow to go to wireframe
-	theHudCamera = new osg::CameraNode;
+	theHudCamera = new osg::Camera;
 	theHudViewport = new osg::Viewport(0,0,1024,1024);
 	theHudText   = new osgText::Text;
 	theHudText->setSupportsDisplayList(false);
@@ -1606,7 +1606,7 @@ void TestHandler::initScene(ossimPlanetViewer* viewer)
                                                           theHudViewport->height()));
 	theHudCamera->setViewMatrix(osg::Matrix::identity());
 	theHudCamera->setClearMask(GL_DEPTH_BUFFER_BIT);
-	theHudCamera->setRenderOrder(osg::CameraNode::POST_RENDER);
+	theHudCamera->setRenderOrder(osg::Camera::POST_RENDER);
 	theHudCamera->addChild(geode.get());
 	osg::BoundingBox bb = osg::BoundingBox();
 	bb.expandBy(theHudText->getBound());	

@@ -3,7 +3,7 @@
 #include <ossimPlanet/ossimPlanetKml.h>
 #include <ossimPlanet/ossimPlanetKmlLayerNode.h>
 #include <osg/Group>
-#include <osg/CameraNode>
+#include <osg/Camera>
 #include <ossimPlanet/ossimPlanetImage.h>
 #include <ossimPlanet/ossimPlanetIconGeom.h>
 
@@ -21,7 +21,7 @@ protected:
    void computeScreenXY(osg::Vec3d& position);
    void computeSize(osg::Vec3d& size);
    
-   osg::ref_ptr<osg::CameraNode> theCameraNode;
+   osg::ref_ptr<osg::Camera> theCameraNode;
    osg::ref_ptr<osg::Group> theGroup;
    osg::ref_ptr<osg::Viewport> theViewport;
    osg::ref_ptr<osg::Geode> theIconGeode; 

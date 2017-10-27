@@ -11,12 +11,12 @@ ossimPlanetKmlScreenOverlayNode::ossimPlanetKmlScreenOverlayNode(ossimPlanetKmlL
                                                                  ossimPlanetKmlObject* obj)
    :ossimPlanetKmlLayerNode(layer, obj)
 {
-   theCameraNode = new osg::CameraNode;
+   theCameraNode = new osg::Camera;
    theGroup = new osg::Group;
    theCameraNode->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
    theCameraNode->setViewMatrix(osg::Matrix::identity());
    theCameraNode->setClearMask(GL_DEPTH_BUFFER_BIT);
-   theCameraNode->setRenderOrder(osg::CameraNode::POST_RENDER);
+   theCameraNode->setRenderOrder(osg::Camera::POST_RENDER);
    theGroup->addChild(theCameraNode.get());
    theViewportChangedFlag = false;
    theNeedsUpdateFlag = false;

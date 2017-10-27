@@ -6,7 +6,7 @@
 #include <osg/Geometry>
 #include <osg/LineWidth>
 #include <osg/Projection>
-#include <osg/CameraNode>
+#include <osg/Camera>
 #include <ossim/base/ossimString.h>
 #include <ossimPlanet/ossimPlanetExport.h>
 #include <ossimPlanet/ossimPlanetCompass.h>
@@ -41,7 +41,7 @@ public:
 protected:
    void initialize();
    void updatePosition();
-   osg::ref_ptr<osg::CameraNode> theCameraNode;
+   osg::ref_ptr<osg::Camera> theCameraNode;
 /*    osg::ref_ptr<osg::Projection> theProjection; */
    osg::ref_ptr<osgText::Text> thePositionText;
    

@@ -876,7 +876,7 @@ void ossimPlanetLand::initShaders()
 {
    theGL2Extensions = new osg::GL2Extensions(0);
    theShadersInitializedFlag = false;
-   if(!theGL2Extensions->isGlslSupported())
+   if(!theGL2Extensions->isGlslSupported)
    {
       theCurrentShaderProgram = 0;
       theReaderWriter->setMultiTextureEnableFlag(false);

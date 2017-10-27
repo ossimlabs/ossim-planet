@@ -9,7 +9,7 @@
 #include <osg/ImageStream>
 #include <osg/Timer>
 #include <osg/Viewport>
-#include <osg/CameraNode>
+#include <osg/Camera>
 #include <osg/MatrixTransform>
 #include <osg/Geode>
 #include <OpenThreads/Thread>
@@ -247,7 +247,7 @@ protected:
    /**
    * Used by the 2-D display mode
    */
-   osg::ref_ptr<osg::CameraNode> theCameraNode; 
+   osg::ref_ptr<osg::Camera> theCameraNode; 
    osg::ref_ptr<osg::Viewport>   theViewport;
    osg::ref_ptr<osg::MatrixTransform> the2DMatrixTransform;
 
