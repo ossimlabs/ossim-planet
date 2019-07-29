@@ -125,8 +125,8 @@ osg::ref_ptr<ossimPlanetImage> ossimPlanetWmsClient::createImage(ossim_uint32 wi
          {
             if(file!= "")
             {
-               ofstream out(file.c_str(),
-                            ios::out|ios::binary);
+               std::ofstream out(file.c_str(),
+                            std::ios::out|std::ios::binary);
                if(out.good())
                {
                   out.write((char*)(memS->getBuffer()),

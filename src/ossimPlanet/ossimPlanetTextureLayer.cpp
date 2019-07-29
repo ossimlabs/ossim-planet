@@ -1443,7 +1443,7 @@ ossimRefPtr<ossimXmlNode> ossimPlanetTextureLayer::saveXml(bool /*recurseFlag*/)
 bool ossimPlanetTextureLayer::loadXml(ossimRefPtr<ossimXmlNode> node)
 {
    if(!node.valid()) return false;
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = node->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = node->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
    for(idx = 0; idx < upper; ++idx)
@@ -1476,7 +1476,7 @@ bool ossimPlanetTextureLayer::loadXml(ossimRefPtr<ossimXmlNode> node)
          if(childNodes[idx]->getChildTextValue(temp, "color"))
          {
             int r,g,b;
-            istringstream in(temp);
+            std::istringstream in(temp);
             in>>r>>g>>b;
             theTransparentColorVector[0] = (unsigned char)r;
             theTransparentColorVector[1] = (unsigned char)g;

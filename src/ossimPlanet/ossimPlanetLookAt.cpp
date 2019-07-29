@@ -2,7 +2,7 @@
 
 bool ossimPlanetLookAt::loadXml(ossimRefPtr<ossimXmlNode> xmlNode)
 {
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
     ossim_uint32 idx;
    ossim_uint32 upper=childNodes.size();
 

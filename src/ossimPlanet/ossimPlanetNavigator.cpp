@@ -1027,10 +1027,10 @@ void ossimPlanetNavigator::destinationCommandExecute(const ossimPlanetDestinatio
 	}
 	else if ("printlatlonelev" == command)
 	{
-		cout << "lat = " << lat_ << "  lon = " << lon_ << "  elev = " << elev() << 'm' << endl;
+		std::cout << "lat = " << lat_ << "  lon = " << lon_ << "  elev = " << elev() << 'm' << std::endl;
 
 	} else if ("printlookcoordinates" == command) {
-		cout << "Look z: " << eyexyz_.z() << "    hpr: " << eyehpr_[0] << ' ' << eyehpr_[1] << ' ' << eyehpr_[2] << endl;
+		std::cout << "Look z: " << eyexyz_.z() << "    hpr: " << eyehpr_[0] << ' ' << eyehpr_[1] << ' ' << eyehpr_[2] << std::endl;
 
 	} else if ("gotoxyz" == command) {
 		eyexyz_.set(mkUtils::asDouble(a.arg(1)), mkUtils::asDouble(a.arg(2)), mkUtils::asDouble(a.arg(3)));
@@ -1270,7 +1270,7 @@ void ossimPlanetNavigator::gotoLatLonElevHpr(const std::string& /*placeName*/,
             double c = sqrt(l*l + h*h - 2.0*l*h*cosTheta);
             oldPhi = 2.0*osg::RadiansToDegrees(atan(c / (2.0*sqrt(1.0 - 0.25*c*c))));
          }
-         float angleDelta = max(fabs(targetLat_ - lat_), fabs(targetLon_ - lon_));   // cheesy
+         float angleDelta = std::max(fabs(targetLat_ - lat_), fabs(targetLon_ - lon_));   // cheesy
          
          // use that stuff to discern and handle the three cases
          if (oldPhi <= 0.0f || angleDelta < oldPhi)
@@ -1291,10 +1291,10 @@ void ossimPlanetNavigator::gotoLatLonElevHpr(const std::string& /*placeName*/,
             double cos2AlphaRecip = 1.0/cos2Alpha;
             
             // solve the quadratic to get distance
-            pair<double, double> distance = mkUtils::quadraticRoots((cosPhi*cosPhi)/cos2Alpha - 1.0, 2.0*cosPhi - 2.0*cosPhi*cos2AlphaRecip, cos2AlphaRecip - 1.0);
+            std::pair<double, double> distance = mkUtils::quadraticRoots((cosPhi*cosPhi)/cos2Alpha - 1.0, 2.0*cosPhi - 2.0*cosPhi*cos2AlphaRecip, cos2AlphaRecip - 1.0);
             if (!ossim::isnan(distance.first))
             {
-               targetMidpointLookZ_ = -max(distance.first, distance.second);  // use higher elevation
+               targetMidpointLookZ_ = -std::max(distance.first, distance.second);  // use higher elevation
             }
             else
             {

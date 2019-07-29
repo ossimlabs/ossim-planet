@@ -99,7 +99,7 @@ osg::ref_ptr<ossimPlanetTextureLayer> ossimPlanetStandardTextureLayerFactory::cr
    bool done = false;
    while(!done)
    {
-      stringstream s;
+      std::stringstream s;
       s << "archive" << idx << ".";
       archiveKey = s.str();
 

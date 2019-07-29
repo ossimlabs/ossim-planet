@@ -77,7 +77,7 @@ protected:
    struct ResamplePoint
    {
    public:
-      friend ostream& operator <<(ostream& out, const ResamplePoint& point)
+      friend std::ostream& operator <<(std::ostream& out, const ResamplePoint& point)
       {
          out << point.theGlobalNdcPoint << "\n"
          << point.theModelPoint << "\n"

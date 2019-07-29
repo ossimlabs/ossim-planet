@@ -153,7 +153,7 @@ public:
    }
    osg::ref_ptr<ossimPlanetGeoRefModel> landModel();
    const osg::ref_ptr<ossimPlanetGeoRefModel> landModel()const;
-	void gotoLatLonElevHpr(const string& placeName, 
+	void gotoLatLonElevHpr(const std::string& placeName, 
                           double latitude, 
                           double longitude, 
                           double elevation, 

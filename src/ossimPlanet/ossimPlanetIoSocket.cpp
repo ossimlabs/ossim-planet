@@ -380,7 +380,7 @@ void ossimPlanetIoSocket::performIo()
                   {
                      // container for multiple Actions
                      //
-                     const vector<ossimRefPtr<ossimXmlNode> >& childNodes = node->getChildNodes();
+                     const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = node->getChildNodes();
                      ossim_uint32 idx = 0;
                      for(idx = 0; idx < childNodes.size();++idx)
                      {

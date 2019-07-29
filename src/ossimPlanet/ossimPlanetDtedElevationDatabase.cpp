@@ -561,7 +561,7 @@ osg::ref_ptr<ossimPlanetDtedElevationDatabase::DtedInfo> ossimPlanetDtedElevatio
    
    ossimFilename dtedFile = ossimFilename(theLocation).dirCat(ossimFilename(name));
 
-   ifstream in;
+   std::ifstream in;
 
    in.open(dtedFile.c_str(), std::ios::binary|std::ios::in);
 

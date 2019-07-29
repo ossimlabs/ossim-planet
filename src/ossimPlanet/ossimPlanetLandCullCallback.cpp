@@ -149,7 +149,7 @@ void ossimPlanetLandCullCallback::applyStandardCull(ossimPlanetPagedLandLod* n, 
 //    double distance = n->theCullNode->eyeDistance();
     double real_distance = (real_eye-bs.center()).length();
     double apparent_distance = (apparent_eye-bs.center()).length();
-    double distance = min( apparent_distance, real_distance ); // this will keep around tiles close to the eye
+    double distance = std::min( apparent_distance, real_distance ); // this will keep around tiles close to the eye
 
 //    double pixelSize = cullVisitor->clampedPixelSize(bs);
     n->theCulledFlag = false;

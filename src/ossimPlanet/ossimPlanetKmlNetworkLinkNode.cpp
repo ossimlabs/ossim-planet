@@ -67,7 +67,7 @@ bool ossimPlanetKmlNetworkLinkNode::init()
                                                                   curlMemoryStream->getStream()->getBufferSize());
       if(stream->getBuffer())
       {
-         stringstream in(ossimString(curlMemoryStream->getStream()->getBuffer(),
+         std::stringstream in(ossimString(curlMemoryStream->getStream()->getBuffer(),
                                      curlMemoryStream->getStream()->getBuffer()+
                                      curlMemoryStream->getStream()->getBufferSize()));
 //         std::cout << "PEEEEEK ==== " << (char)in.peek() << std::endl;

@@ -349,7 +349,7 @@ bool ossimPlanetKmlBalloonStyle::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
       return false;
    }
 
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
 
    ossim_uint32 idx;
    ossim_uint32 upper=childNodes.size();
@@ -397,7 +397,7 @@ bool ossimPlanetKmlLod::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
 
    ossim_uint32 idx;
    ossim_uint32 upper=childNodes.size();
@@ -453,7 +453,7 @@ bool ossimPlanetKmlScale::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
       return false;
    }
 
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
 
@@ -497,7 +497,7 @@ bool ossimPlanetKmlLocation::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
       return false;
    }
 
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
 
@@ -542,7 +542,7 @@ bool ossimPlanetKmlOrientation::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    }
 
 
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
 
@@ -658,7 +658,7 @@ bool ossimPlanetKmlColorStyle::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
 
    ossim_uint32 idx;
    ossim_uint32 upper = childNodes.size();;
@@ -749,7 +749,7 @@ bool ossimPlanetKmlIconStyle::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
    ossim_uint32 count = 0;
@@ -856,7 +856,7 @@ bool ossimPlanetKmlStyle::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
    for(idx = 0; idx < upper; ++idx)
@@ -955,7 +955,7 @@ bool ossimPlanetKmlStyleMap::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
    for(idx = 0; idx < upper; ++idx)
@@ -1129,7 +1129,7 @@ bool ossimPlanetKmlRegion::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
    for(idx = 0; idx < upper; ++idx)
@@ -1302,7 +1302,7 @@ bool ossimPlanetKmlFeature::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 upper = childNodes.size();
    for(idx = 0; idx < upper; ++idx)
@@ -1523,7 +1523,7 @@ bool ossimPlanetKmlPoint::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    bool hasCoordinates = true;
    for(idx = 0; idx < childNodes.size(); ++idx)
@@ -1581,7 +1581,7 @@ bool ossimPlanetKmlLineString::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    }
    ossimString tempString;
 
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    bool hasCoordinates = false;
    for(idx = 0; idx < childNodes.size(); ++idx)
@@ -1642,7 +1642,7 @@ bool ossimPlanetKmlLinearRing::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    }
    ossimString tempString;
 
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    bool hasCoordinates = false;
    for(idx = 0; idx < childNodes.size(); ++idx)
@@ -1701,7 +1701,7 @@ bool ossimPlanetKmlPolygon::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 bound = childNodes.size();
 
@@ -1782,7 +1782,7 @@ bool ossimPlanetKmlMultiGeometry::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 bound = childNodes.size();
 
@@ -1831,7 +1831,7 @@ bool ossimPlanetKmlModel::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    ossim_uint32 bound = childNodes.size();
    for(idx = 0; idx < bound; ++idx)
@@ -2129,7 +2129,7 @@ bool ossimPlanetKmlNetworkLink::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       return false;
    }
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    ossim_uint32 idx = 0;
    for(idx = 0; idx < childNodes.size(); ++idx)
    {
@@ -2188,7 +2188,7 @@ bool ossimPlanetKmlPlacemark::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    {
       ossim_uint32 foundCount = 0;
       ossim_uint32 idx = 0;
-      const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+      const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
       for(idx = 0; (idx < childNodes.size())&&(foundCount < 1); ++idx)
       {
         std::string tag = childNodes[idx]->getTag().c_str();
@@ -2251,7 +2251,7 @@ bool ossimPlanetKmlContainer::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    bool result = ossimPlanetKmlFeature::parse(xmlNode);
    if(result)
    {
-      const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+      const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
       ossim_uint32 idx = 0;
       
       for(idx = 0; (idx < childNodes.size())&&result; ++idx)
@@ -2398,7 +2398,7 @@ bool ossimPlanetKml::parse(const ossimRefPtr<ossimXmlNode> xmlNode)
    if(!xmlNode.valid()) return false;
    if(xmlNode->getTag() != "kml") return false;
    
-   const vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
+   const std::vector<ossimRefPtr<ossimXmlNode> >& childNodes = xmlNode->getChildNodes();
    
    ossim_uint32 idx = 0;
    
