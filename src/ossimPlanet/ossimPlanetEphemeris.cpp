@@ -43,7 +43,7 @@
 #include <osgDB/WriteFile>
 #include <queue>
 
-
+using namespace std;
 
 
 class EnvEffect : public osg::Referenced
