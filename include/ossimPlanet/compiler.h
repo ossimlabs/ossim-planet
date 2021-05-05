@@ -229,7 +229,11 @@
 #    define STL_STRSTREAM  <strstream>
 
 #    define isnan _isnan
-#    define snprintf _snprintf
+
+// Windows vs 2017 fix:
+// #error:  Macro definition of snprintf conflicts with Standard Library
+// function declaration.
+// #    define snprintf _snprintf
 
 #    pragma warning(disable: 4786) // identifier was truncated to '255' characters
 #    pragma warning(disable: 4244) // conversion from double to float
