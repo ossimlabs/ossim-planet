@@ -9,7 +9,7 @@
    Read zip.h for more info
 */
 
-
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
