@@ -1054,8 +1054,8 @@ ossimPlanetTextureLayerStateCode ossimPlanetOssimImageLayer::buildChain()
       theChain.insert(theChain.begin(), theCut.get());
       
 
-      theProjection = new ossimLlxyProjection;
-     // theProjection = new ossimEquDistCylProjection;
+     // theProjection = new ossimLlxyProjection;
+      theProjection = new ossimEquDistCylProjection;
       
       theImageGeometry->setProjection(theProjection.get());
       if(!theViewInterface)
