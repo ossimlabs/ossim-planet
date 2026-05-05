@@ -82,6 +82,16 @@ INCLUDE_DIRECTORIES(${JPEG_INCLUDE_DIR})
 FILE(GLOB OSSIMPLANET_SRCS RELATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/src/ossimPlanet/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/ossimPlanet/*.c")
 FILE(GLOB OSSIMPLANET_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/ossimPlanet/*.h")
 
+IF(GPSTK_FOUND AND OSSIMPLANET_ENABLE_EPHEMERIS AND
+   CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+   # GPSTK's public headers are not compatible with standards newer than C++14.
+   # Ephemeris keeps the GPSTK dependency hidden behind a pimpl, so constrain
+   # only this translation unit and let the rest of ossim-planet use the
+   # workspace default.
+   SET_SOURCE_FILES_PROPERTIES(src/ossimPlanet/ossimPlanetEphemeris.cpp
+                               PROPERTIES COMPILE_FLAGS "-std=c++14")
+ENDIF()
+
 IF(NOT BUILD_OSSIM_VIDEO)
    LIST(REMOVE_ITEM OSSIMPLANET_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/src/ossimPlanet/ossimPlanetPredatorVideoLayerNode.cpp")
    LIST(REMOVE_ITEM OSSIMPLANET_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/ossimPlanet/ossimPlanetPredatorVideoLayerNode.h")
