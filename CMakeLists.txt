@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.5)
 PROJECT(ossim-planet)
 MESSAGE("**********************Setting up ossim-planet********************")
 INCLUDE(OssimVersion)
@@ -5,12 +6,6 @@ INCLUDE(OssimUtilities)
 INCLUDE(OssimCommonVariables)
 
 OPTION(OSSIMPLANET_ENABLE_EPHEMERIS "Set to ON enable ephemeris support if GPSTK is found.  Use OFF to not enable ephemeris." ON)
-
-IF(NOT APPLE)
-  cmake_minimum_required(VERSION 2.6)
-ELSE(NOT APPLE)
-  cmake_minimum_required(VERSION 2.8)
-ENDIF(NOT APPLE)
 
 find_package(OpenThreads)
 find_package(ossim)
